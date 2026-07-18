@@ -21,4 +21,6 @@ nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
 cd "$WORK/sae-spelling"
 python "$WORK/run_gate.py" --layer 12 --width 16000 --target-l0 68 \
     --max-prompts 200 --results-dir "$WORK/results/gate"
-echo "JOB_DONE rc=$?"
+rc=$?
+echo "JOB_DONE rc=$rc"
+exit $rc

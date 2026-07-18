@@ -17,8 +17,13 @@ public SAEs (Gemma Scope), to answer that question.
 
 ## Status
 
-Early / in progress. **Week 1 gate:** reproduce the published first-letter absorption on a
-current Gemma Scope SAE before extending. See [`PLAN.md`](PLAN.md).
+**Week-1 gate: PASSED** (2026-07-18). Reproduced first-letter feature absorption on a current
+Gemma Scope SAE (Gemma-2-2b, **layer 12 / width 16k / L0 82**), 200 prompts/letter, on GPU.
+**Mean absorption rate = 0.032**, with the expected wide per-letter variance
+(`u` 0.19, `s` 0.11, `i` 0.10, `c` 0.08 highest; most letters near 0) — matching Chanin et al.'s
+qualitative finding, and `s` (their worked-example letter, *short*) among the highest. Numbers in
+[`results/gate/gate_summary.json`](results/gate/gate_summary.json). Next: the multi-property battery.
+See [`PLAN.md`](PLAN.md).
 
 ## Method (from Chanin et al. + their reference code)
 

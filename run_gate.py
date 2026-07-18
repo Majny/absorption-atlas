@@ -33,6 +33,15 @@ if "HF_TOKEN" not in os.environ:
 import pandas as pd  # noqa: E402
 import torch  # noqa: E402
 
+# sae-spelling was written for torch <2.6 (weights_only default False). torch 2.6+ flips the
+# default to True, which refuses to unpickle the custom LinearProbe checkpoint. Our probe files
+# are locally produced + trusted, so restore the old behavior for all torch.load calls.
+_orig_torch_load = torch.load
+def _torch_load_compat(*a, **k):  # noqa: E306
+    k.setdefault("weights_only", False)
+    return _orig_torch_load(*a, **k)
+torch.load = _torch_load_compat
+
 from sae_spelling.experiments.common import (  # noqa: E402
     DEFAULT_DEVICE,
     SaeInfo,
