@@ -1,0 +1,9 @@
+.env
+sae-spelling/
+.venv/
+__pycache__/
+*.pyc
+results/
+*.pt
+*.safetensors
+.ipynb_checkpoints/
