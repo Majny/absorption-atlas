@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -N abs_sweep
+#PBS -q gpu
+#PBS -l select=1:ncpus=8:ngpus=1:mem=64gb:gpu_mem=40gb:scratch_local=10gb
+#PBS -l walltime=4:00:00
+#PBS -j oe
+#PBS -m ae
+# L0 sweep at layer 12 / 16k — reproduce the absorption-rate-vs-L0 trend (Chanin Fig 7b, one layer).
+# Probe is cached (shared across L0s at a layer), so each L0 = k-sparse + absorption only.
+set -uo pipefail
+WORK=/storage/brno2/home/${USER}/absorption-atlas
+export HF_HOME=$WORK/hf_cache
+export MAMBA_ROOT_PREFIX=$WORK/mamba
+[ -f "$WORK/.hf_token" ] && source "$WORK/.hf_token"
+eval "$("$WORK/bin/micromamba" shell hook -s bash)"
+micromamba activate abs
+hostname; nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
+cd "$WORK/sae-spelling"
+rc=0
+for L0 in 22 41 82 176 445; do
+  echo "######## L0=$L0 ########"
+  python "$WORK/run_gate.py" --layer 12 --width 16000 --target-l0 "$L0" \
+      --max-prompts 200 --results-dir "$WORK/results/gate" || rc=$?
+done
+echo "SWEEP_DONE rc=$rc"
+exit $rc

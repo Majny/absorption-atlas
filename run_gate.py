@@ -180,8 +180,9 @@ def main():
                        "ablation_delta": ABSORPTION_FEATURE_DELTA_THRESHOLD},
         "device": DEFAULT_DEVICE,
     }
-    (Path(results_dir) / "gate_summary.json").write_text(json.dumps(summary, indent=2))
-    print(f"\nsaved -> {results_dir}/gate_summary.json", flush=True)
+    summary_path = Path(results_dir) / f"gate_summary_l0{sae_info.l0}.json"
+    summary_path.write_text(json.dumps(summary, indent=2))
+    print(f"\nsaved -> {summary_path}", flush=True)
     print("GATE_DONE", flush=True)
 
 
