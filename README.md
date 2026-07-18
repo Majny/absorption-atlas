@@ -17,13 +17,26 @@ public SAEs (Gemma Scope), to answer that question.
 
 ## Status
 
-**Week-1 gate: PASSED** (2026-07-18). Reproduced first-letter feature absorption on a current
-Gemma Scope SAE (Gemma-2-2b, **layer 12 / width 16k / L0 82**), 200 prompts/letter, on GPU.
-**Mean absorption rate = 0.032**, with the expected wide per-letter variance
-(`u` 0.19, `s` 0.11, `i` 0.10, `c` 0.08 highest; most letters near 0) — matching Chanin et al.'s
-qualitative finding, and `s` (their worked-example letter, *short*) among the highest. Numbers in
-[`results/gate/gate_summary.json`](results/gate/gate_summary.json). Next: the multi-property battery.
-See [`PLAN.md`](PLAN.md).
+**Week-1 gate: PASSED** (2026-07-18). Reproduced first-letter feature absorption on current Gemma
+Scope SAEs (Gemma-2-2b, layer 12, width 16k), 200 prompts/letter, on GPU. Rather than a single
+number, an **L0 sweep** reproduces the paper's central law — absorption rises steeply as L0 falls —
+and sits a consistent ~2.6–3.4× *below* SAEBench's own JumpReLU reference, exactly as expected for
+Google's better-trained Gemma Scope SAEs:
+
+![absorption vs L0](results/gate/absorption_vs_l0.png)
+
+| L0 | mean full-absorption |
+|----|----------------------|
+| 22 | 0.127 |
+| 41 | 0.100 |
+| 82 | 0.034 |
+| 176 | 0.019 |
+| 445 | 0.010 |
+
+Per-letter variance is wide with `s` (Chanin's worked-example letter, *short*) among the highest.
+Independently verified as a faithful reproduction — see
+[`results/gate/VERIFICATION.md`](results/gate/VERIFICATION.md). Next: the multi-property battery
+(does absorption appear for last-letter and binary token properties too?). See [`PLAN.md`](PLAN.md).
 
 ## Method (from Chanin et al. + their reference code)
 

@@ -1,0 +1,170 @@
+{
+  "layer": 12,
+  "width": 16000,
+  "l0": 22,
+  "max_prompts_per_letter": 200,
+  "mean_absorption_rate": 0.1271538059432102,
+  "per_letter": [
+    {
+      "letter": "s",
+      "absorption_rate": 0.332847965738758,
+      "num_absorption": 932.64,
+      "num_probe_true_positives": 2802.0
+    },
+    {
+      "letter": "m",
+      "absorption_rate": 0.2956687185226637,
+      "num_absorption": 528.36,
+      "num_probe_true_positives": 1787.0
+    },
+    {
+      "letter": "c",
+      "absorption_rate": 0.24383333333333332,
+      "num_absorption": 694.925,
+      "num_probe_true_positives": 2850.0
+    },
+    {
+      "letter": "r",
+      "absorption_rate": 0.2299330900243309,
+      "num_absorption": 378.01,
+      "num_probe_true_positives": 1644.0
+    },
+    {
+      "letter": "a",
+      "absorption_rate": 0.21894892672094746,
+      "num_absorption": 591.6,
+      "num_probe_true_positives": 2702.0
+    },
+    {
+      "letter": "u",
+      "absorption_rate": 0.2171771217712177,
+      "num_absorption": 176.565,
+      "num_probe_true_positives": 813.0
+    },
+    {
+      "letter": "d",
+      "absorption_rate": 0.17509981851179673,
+      "num_absorption": 289.44,
+      "num_probe_true_positives": 1653.0
+    },
+    {
+      "letter": "l",
+      "absorption_rate": 0.16728209191759114,
+      "num_absorption": 211.11,
+      "num_probe_true_positives": 1262.0
+    },
+    {
+      "letter": "f",
+      "absorption_rate": 0.16655948553054664,
+      "num_absorption": 207.20000000000002,
+      "num_probe_true_positives": 1244.0
+    },
+    {
+      "letter": "i",
+      "absorption_rate": 0.15916471962616824,
+      "num_absorption": 272.49,
+      "num_probe_true_positives": 1712.0
+    },
+    {
+      "letter": "p",
+      "absorption_rate": 0.14296035242290747,
+      "num_absorption": 324.52,
+      "num_probe_true_positives": 2270.0
+    },
+    {
+      "letter": "g",
+      "absorption_rate": 0.13680051813471503,
+      "num_absorption": 158.415,
+      "num_probe_true_positives": 1158.0
+    },
+    {
+      "letter": "t",
+      "absorption_rate": 0.11280167264038231,
+      "num_absorption": 188.82999999999998,
+      "num_probe_true_positives": 1674.0
+    },
+    {
+      "letter": "w",
+      "absorption_rate": 0.1067930029154519,
+      "num_absorption": 73.26,
+      "num_probe_true_positives": 686.0
+    },
+    {
+      "letter": "b",
+      "absorption_rate": 0.09509503372164316,
+      "num_absorption": 155.1,
+      "num_probe_true_positives": 1631.0
+    },
+    {
+      "letter": "v",
+      "absorption_rate": 0.0736842105263158,
+      "num_absorption": 60.2,
+      "num_probe_true_positives": 817.0
+    },
+    {
+      "letter": "o",
+      "absorption_rate": 0.06841628959276018,
+      "num_absorption": 75.6,
+      "num_probe_true_positives": 1105.0
+    },
+    {
+      "letter": "h",
+      "absorption_rate": 0.06485204081632652,
+      "num_absorption": 63.55499999999999,
+      "num_probe_true_positives": 980.0
+    },
+    {
+      "letter": "n",
+      "absorption_rate": 0.05819477434679335,
+      "num_absorption": 49.0,
+      "num_probe_true_positives": 842.0
+    },
+    {
+      "letter": "e",
+      "absorption_rate": 0.053347639484978546,
+      "num_absorption": 87.01,
+      "num_probe_true_positives": 1631.0
+    },
+    {
+      "letter": "j",
+      "absorption_rate": 0.05203619909502263,
+      "num_absorption": 23.0,
+      "num_probe_true_positives": 442.0
+    },
+    {
+      "letter": "y",
+      "absorption_rate": 0.04666666666666667,
+      "num_absorption": 7.0,
+      "num_probe_true_positives": 150.0
+    },
+    {
+      "letter": "q",
+      "absorption_rate": 0.04477611940298507,
+      "num_absorption": 9.0,
+      "num_probe_true_positives": 201.0
+    },
+    {
+      "letter": "k",
+      "absorption_rate": 0.022857142857142857,
+      "num_absorption": 16.0,
+      "num_probe_true_positives": 700.0
+    },
+    {
+      "letter": "x",
+      "absorption_rate": 0.020202020202020204,
+      "num_absorption": 2.0,
+      "num_probe_true_positives": 99.0
+    },
+    {
+      "letter": "z",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 280.0
+    }
+  ],
+  "thresholds": {
+    "probe_cos": 0.025,
+    "ablation_delta": 1.0
+  },
+  "device": "cuda"
+}

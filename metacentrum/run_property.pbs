@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -N abs_lastletter
+#PBS -q gpu
+#PBS -l select=1:ncpus=8:ngpus=1:mem=64gb:gpu_mem=40gb:scratch_local=10gb
+#PBS -l walltime=4:00:00
+#PBS -j oe
+#PBS -m ae
+# First NOVEL result: does feature absorption appear for LAST-letter too (not just first-letter)?
+# Full L0 sweep at layer 12/16k so the last-letter curve is directly comparable to first-letter.
+# The last-letter probe is trained once (first L0) then cached across L0s.
+set -uo pipefail
+WORK=/storage/brno2/home/${USER}/absorption-atlas
+export HF_HOME=$WORK/hf_cache
+export MAMBA_ROOT_PREFIX=$WORK/mamba
+[ -f "$WORK/.hf_token" ] && source "$WORK/.hf_token"
+eval "$("$WORK/bin/micromamba" shell hook -s bash)"
+micromamba activate abs
+hostname; nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
+cd "$WORK/sae-spelling"
+rc=0
+for L0 in 82 22 41 176 445; do
+  echo "######## last_letter L0=$L0 ########"
+  python "$WORK/run_property.py" --property last_letter --layer 12 --width 16000 \
+      --target-l0 "$L0" --max-prompts 200 --results-dir "$WORK/results" || rc=$?
+done
+echo "PROPERTY_SWEEP_DONE rc=$rc"
+exit $rc

@@ -1,0 +1,80 @@
+{
+  "layer": 12,
+  "width": 16000,
+  "l0": 445,
+  "max_prompts_per_letter": 200,
+  "mean_absorption_rate": 0.010408993991083543,
+  "per_letter": [
+    {
+      "letter": "y",
+      "absorption_rate": 0.06666666666666667,
+      "num_absorption": 10.0,
+      "num_probe_true_positives": 150.0
+    },
+    {
+      "letter": "z",
+      "absorption_rate": 0.04285714285714286,
+      "num_absorption": 12.0,
+      "num_probe_true_positives": 280.0
+    },
+    {
+      "letter": "q",
+      "absorption_rate": 0.004975124378109453,
+      "num_absorption": 1.0,
+      "num_probe_true_positives": 201.0
+    },
+    {
+      "letter": "a",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 2702.0
+    },
+    {
+      "letter": "b",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 1631.0
+    },
+    {
+      "letter": "d",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 1653.0
+    },
+    {
+      "letter": "e",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 1631.0
+    },
+    {
+      "letter": "j",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 442.0
+    },
+    {
+      "letter": "m",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 1787.0
+    },
+    {
+      "letter": "w",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 686.0
+    },
+    {
+      "letter": "x",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 99.0
+    }
+  ],
+  "thresholds": {
+    "probe_cos": 0.025,
+    "ablation_delta": 1.0
+  },
+  "device": "cuda"
+}
