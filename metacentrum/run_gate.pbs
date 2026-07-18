@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -N abs_gate
+#PBS -q gpu
+#PBS -l select=1:ncpus=8:ngpus=1:mem=64gb:gpu_mem=24gb:scratch_local=10gb
+#PBS -l walltime=6:00:00
+#PBS -j oe
+#PBS -m ae
+# GPU gate: reproduce first-letter absorption on Gemma Scope layer 12 / 16k / L0 82.
+set -uo pipefail
+WORK=/storage/brno2/home/${USER}/absorption-atlas
+export HF_HOME=$WORK/hf_cache
+export MAMBA_ROOT_PREFIX=$WORK/mamba
+[ -f "$WORK/.hf_token" ] && source "$WORK/.hf_token"
+eval "$("$WORK/bin/micromamba" shell hook -s bash)"
+micromamba activate abs
+
+echo "=== node / gpu ==="
+hostname
+nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
+
+cd "$WORK/sae-spelling"
+python "$WORK/run_gate.py" --layer 12 --width 16000 --target-l0 68 \
+    --max-prompts 200 --results-dir "$WORK/results/gate"
+echo "JOB_DONE rc=$?"
