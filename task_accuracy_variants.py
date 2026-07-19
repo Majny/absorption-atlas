@@ -21,11 +21,21 @@ if "HF_TOKEN" not in os.environ:
                     os.environ["HF_TOKEN"] = line.split("=", 1)[1].strip()
             break
 
+import argparse  # noqa: E402
+
 import numpy as np  # noqa: E402
 import torch  # noqa: E402
+from transformer_lens import HookedTransformer  # noqa: E402
 
 from sae_spelling.experiments.common import DEFAULT_DEVICE, load_gemma2_model  # noqa: E402
 from sae_spelling.vocab import get_alpha_tokens  # noqa: E402
+
+
+def load_model(name):
+    if name.endswith("gemma-2-2b"):
+        return load_gemma2_model()
+    dtype = "bfloat16" if torch.cuda.is_available() else "float32"
+    return HookedTransformer.from_pretrained(name, dtype=dtype, device=DEFAULT_DEVICE)
 
 random.seed(0)
 CAP = lambda w: w.strip()[:1].isupper()  # noqa: E731
@@ -44,7 +54,11 @@ VARIANTS = [
 
 
 def main():
-    model = load_gemma2_model()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model", default="google/gemma-2-2b")
+    args = ap.parse_args()
+    print(f"model={args.model}", flush=True)
+    model = load_model(args.model)
     tok = model.tokenizer
     vocab = get_alpha_tokens(tok)
     pos_pool = [w for w in vocab if CAP(w)]
