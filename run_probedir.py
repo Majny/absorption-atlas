@@ -104,36 +104,54 @@ def main():
     contrib_w = Wdec @ probe_units.T  # (d_sae, n_probes)
 
     Rs = [1.5, 2.0, 3.0]
-    n_main_silent = 0
-    n_abs = {R: 0 for R in Rs}
-    # group candidates into batches sharing the same probe row + same prompt length
+    torch.manual_seed(0)
+    # one forward per candidate; keep the SAE acts of every main-silent candidate for both the
+    # concept-direction rate AND a random-direction control (SAE sparsity baseline).
+    A, PIDX, MF = [], [], []
     with torch.inference_mode():
         for i in range(0, len(cands), 24):
             batch = cands[i:i + 24]
             prompts = [create_icl_prompt(tok, examples=vocab, base_template=template,
                                          answer_formatter=formatter, max_icl_examples=10).base
                        for tok, _, _ in batch]
-            toks = model.to_tokens(prompts)
-            resid = model.run_with_cache(toks, names_filter=[hook])[1][hook][:, pos, :]  # (B,d_model)
+            resid = model.run_with_cache(model.to_tokens(prompts),
+                                         names_filter=[hook])[1][hook][:, pos, :]
             acts = sae.encode(resid.to(sae.device)).float().cpu()  # (B,d_sae)
             for b, (tok, pidx, mf) in enumerate(batch):
                 a = acts[b]
-                if not bool((a[mf] < EPS).all()):
-                    continue  # main not silent -> not in conditioned pool
-                n_main_silent += 1
-                contrib = a * contrib_w[:, pidx]  # (d_sae,) contribution to probe projection
-                contrib[mf] = -float("inf")        # exclude main latents from the "absorber"
-                top2 = torch.topk(contrib, 2).values
-                top, second = float(top2[0]), float(top2[1])
-                for R in Rs:
-                    if top > 0 and top >= R * max(second, 0.0):
-                        n_abs[R] += 1
+                if bool((a[mf] < EPS).all()):     # conditioned pool = main latent silent
+                    A.append(a); PIDX.append(pidx); MF.append(mf)
+    M = len(A)
 
-    rates = {R: (n_abs[R] / n_main_silent if n_main_silent else float("nan")) for R in Rs}
-    out = {"property": args.property, "n_candidates": len(cands), "n_main_silent": n_main_silent,
-           "probedir_conditioned_rate": rates, "n_absorbed": n_abs}
-    print(f"[probedir] {args.property}: main_silent={n_main_silent}; conditioned rate "
-          + ", ".join(f"R{R}={rates[R]:.4f}" for R in Rs), flush=True)
+    def rate(weights_fn):
+        """fraction of main-silent candidates where ONE non-main latent dominates the projection."""
+        n = {R: 0 for R in Rs}
+        for i in range(M):
+            contrib = A[i] * weights_fn(i)
+            contrib[MF[i]] = -float("inf")         # exclude the concept's own main latents
+            t2 = torch.topk(contrib, 2).values
+            top, sec = float(t2[0]), float(t2[1])
+            for R in Rs:
+                if top > 0 and top >= R * max(sec, 0.0):
+                    n[R] += 1
+        return {R: (n[R] / M if M else float("nan")) for R in Rs}
+
+    concept = rate(lambda i: contrib_w[:, PIDX[i]])
+    # random-direction control: if a RANDOM direction absorbs as much, "absorption" is just SAE
+    # sparsity (one latent dominates any projection), not concept-specific.
+    rand_runs = []
+    for _ in range(5):
+        r = torch.randn(model.cfg.d_model); r = r / r.norm()
+        cw = Wdec @ r
+        rand_runs.append(rate(lambda i, cw=cw: cw))
+    rand_mean = {R: float(np.mean([rr[R] for rr in rand_runs])) for R in Rs}
+
+    out = {"property": args.property, "n_candidates": len(cands), "n_main_silent": M,
+           "probedir_conditioned_rate": concept, "random_dir_control": rand_mean}
+    print(f"[probedir] {args.property}: M={M} | concept "
+          + ",".join(f"R{R}={concept[R]:.3f}" for R in Rs)
+          + " | random " + ",".join(f"R{R}={rand_mean[R]:.3f}" for R in Rs), flush=True)
+    (RESULTS / args.property).mkdir(parents=True, exist_ok=True)
     (RESULTS / args.property / f"probedir_l0{args.l0}.json").write_text(json.dumps(out, indent=2))
     print("PROBEDIR_DONE", flush=True)
 

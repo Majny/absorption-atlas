@@ -1,0 +1,15 @@
+{
+  "property": "suffix_ing",
+  "n_candidates": 18,
+  "n_main_silent": 16,
+  "probedir_conditioned_rate": {
+    "1.5": 0.875,
+    "2.0": 0.875,
+    "3.0": 0.8125
+  },
+  "random_dir_control": {
+    "1.5": 0.2875,
+    "2.0": 0.175,
+    "3.0": 0.1
+  }
+}
