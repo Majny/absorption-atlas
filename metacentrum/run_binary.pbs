@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -N abs_binary
+#PBS -q gpu
+#PBS -l select=1:ncpus=8:ngpus=1:mem=64gb:gpu_mem=40gb:scratch_local=10gb
+#PBS -l walltime=3:00:00
+#PBS -j oe
+#PBS -m ae
+# Binary-property absorption on the baseline Gemma Scope SAE. Property via `qsub -v PROP=...`.
+set -uo pipefail
+WORK=/storage/brno2/home/${USER}/absorption-atlas
+export HF_HOME=$WORK/hf_cache
+export MAMBA_ROOT_PREFIX=$WORK/mamba
+[ -f "$WORK/.hf_token" ] && source "$WORK/.hf_token"
+eval "$("$WORK/bin/micromamba" shell hook -s bash)"
+micromamba activate abs
+PROP=${PROP:-is_capitalized}
+hostname; nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
+cd "$WORK/sae-spelling"
+python "$WORK/run_binary.py" --property "$PROP" --layer 12 --width 16000 \
+    --target-l0 82 --max-prompts 200 --results-dir "$WORK/results"
+rc=$?
+echo "BINARY_JOB_DONE rc=$rc"
+exit $rc
