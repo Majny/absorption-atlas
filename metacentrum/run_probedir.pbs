@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -N abs_probedir
+#PBS -q gpu
+#PBS -l select=1:ncpus=8:ngpus=1:mem=64gb:gpu_mem=40gb:scratch_local=10gb
+#PBS -l walltime=2:00:00
+#PBS -j oe
+set -uo pipefail
+WORK=/storage/brno2/home/${USER}/absorption-atlas
+export HF_HOME=$WORK/hf_cache MAMBA_ROOT_PREFIX=$WORK/mamba
+[ -f "$WORK/.hf_token" ] && source "$WORK/.hf_token"
+eval "$("$WORK/bin/micromamba" shell hook -s bash)"; micromamba activate abs
+cd "$WORK/sae-spelling"
+for P in first_letter last_letter is_capitalized all_caps suffix_ing suffix_ed; do
+  echo "######## probedir $P ########"
+  python "$WORK/run_probedir.py" --property "$P" || echo "FAILED $P"
+done
+echo "PROBEDIR_SWEEP_DONE"

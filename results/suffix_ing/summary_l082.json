@@ -1,0 +1,63 @@
+{
+  "property": "suffix_ing",
+  "template": "{word} ends with -ing:",
+  "layer": 12,
+  "width": 16000,
+  "l0": 82,
+  "word_token_pos": -6,
+  "vocab_size": 169016,
+  "positives": 4593,
+  "probe_auroc": 0.9995396890135998,
+  "ksparse_best_f1": 0.8668304668304668,
+  "ksparse_main_k": 1,
+  "ksparse_f1_by_k": {
+    "1": 0.821173104434907,
+    "2": 0.8352490421455939,
+    "3": 0.8556045031815956,
+    "4": 0.8503169185763042,
+    "5": 0.8581246931762395,
+    "6": 0.8616445100935499,
+    "7": 0.8598130841121495,
+    "8": 0.860933660933661,
+    "9": 0.8627643876045253,
+    "10": 0.8647319232661091,
+    "11": 0.8647058823529412,
+    "12": 0.8668304668304668,
+    "13": 0.8603515625,
+    "14": 0.8604878048780488,
+    "15": 0.8604878048780488,
+    "20": 0.8618838457784285,
+    "50": 0.859367396593674
+  },
+  "main_feats": [
+    4736
+  ],
+  "clean_latent": true,
+  "probe_true_positives": 873,
+  "num_candidates": 21,
+  "device": "cuda",
+  "max_prompts_per_property": 200,
+  "absorption_rate": 0.0,
+  "absorption_rate_by_iggap": {
+    "0.5": 0.0,
+    "1.0": 0.0,
+    "2.0": 0.0,
+    "4.0": 0.0
+  },
+  "sample_portion": 1.0,
+  "num_sampled": 18,
+  "funnel": {
+    "sampled": 18,
+    "main_silent": 18,
+    "top_ablation_negative": 18,
+    "top_cos_ge_thresh": 2,
+    "neg_and_cos_ok": 2
+  },
+  "diagnostics": {
+    "top_ablation_median": -0.0634765625,
+    "top_ablation_min": -0.15625,
+    "top_cos_median": 0.00630292110145092,
+    "top_cos_max": 0.05471521615982056,
+    "gap_median": 0.0174560546875
+  }
+}
