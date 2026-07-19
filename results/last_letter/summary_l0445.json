@@ -1,0 +1,137 @@
+{
+  "property": "last_letter",
+  "layer": 12,
+  "width": 16000,
+  "l0": 445,
+  "max_prompts_per_letter": 200,
+  "mean_absorption_rate": 0.01669893362025176,
+  "per_letter": [
+    {
+      "letter": "x",
+      "absorption_rate": 0.1552511415525114,
+      "num_absorption": 34.0,
+      "num_probe_true_positives": 219.0
+    },
+    {
+      "letter": "z",
+      "absorption_rate": 0.10843373493975904,
+      "num_absorption": 27.0,
+      "num_probe_true_positives": 249.0
+    },
+    {
+      "letter": "w",
+      "absorption_rate": 0.028708133971291867,
+      "num_absorption": 6.0,
+      "num_probe_true_positives": 209.0
+    },
+    {
+      "letter": "q",
+      "absorption_rate": 0.02857142857142857,
+      "num_absorption": 1.0,
+      "num_probe_true_positives": 35.0
+    },
+    {
+      "letter": "y",
+      "absorption_rate": 0.007367716008037508,
+      "num_absorption": 11.0,
+      "num_probe_true_positives": 1493.0
+    },
+    {
+      "letter": "k",
+      "absorption_rate": 0.007233273056057866,
+      "num_absorption": 4.0,
+      "num_probe_true_positives": 553.0
+    },
+    {
+      "letter": "b",
+      "absorption_rate": 0.004201680672268907,
+      "num_absorption": 1.0,
+      "num_probe_true_positives": 238.0
+    },
+    {
+      "letter": "s",
+      "absorption_rate": 0.0034936292642827787,
+      "num_absorption": 17.0,
+      "num_probe_true_positives": 4866.0
+    },
+    {
+      "letter": "h",
+      "absorption_rate": 0.002890173410404624,
+      "num_absorption": 2.0,
+      "num_probe_true_positives": 692.0
+    },
+    {
+      "letter": "r",
+      "absorption_rate": 0.0016549441456350847,
+      "num_absorption": 4.0,
+      "num_probe_true_positives": 2417.0
+    },
+    {
+      "letter": "t",
+      "absorption_rate": 0.001312910284463895,
+      "num_absorption": 3.0,
+      "num_probe_true_positives": 2285.0
+    },
+    {
+      "letter": "g",
+      "absorption_rate": 0.000693000693000693,
+      "num_absorption": 1.0,
+      "num_probe_true_positives": 1443.0
+    },
+    {
+      "letter": "d",
+      "absorption_rate": 0.0005246589716684155,
+      "num_absorption": 1.0,
+      "num_probe_true_positives": 1906.0
+    },
+    {
+      "letter": "n",
+      "absorption_rate": 0.000341180484476288,
+      "num_absorption": 1.0,
+      "num_probe_true_positives": 2931.0
+    },
+    {
+      "letter": "p",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 466.0
+    },
+    {
+      "letter": "j",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 95.0
+    },
+    {
+      "letter": "u",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 427.0
+    },
+    {
+      "letter": "f",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 263.0
+    },
+    {
+      "letter": "e",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 4037.0
+    },
+    {
+      "letter": "c",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 595.0
+    },
+    {
+      "letter": "a",
+      "absorption_rate": 0.0,
+      "num_absorption": 0.0,
+      "num_probe_true_positives": 2129.0
+    }
+  ],
+  "device": "cuda"
+}

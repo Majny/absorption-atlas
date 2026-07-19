@@ -35,8 +35,25 @@ Google's better-trained Gemma Scope SAEs:
 
 Per-letter variance is wide with `s` (Chanin's worked-example letter, *short*) among the highest.
 Independently verified as a faithful reproduction — see
-[`results/gate/VERIFICATION.md`](results/gate/VERIFICATION.md). Next: the multi-property battery
-(does absorption appear for last-letter and binary token properties too?). See [`PLAN.md`](PLAN.md).
+[`results/gate/VERIFICATION.md`](results/gate/VERIFICATION.md).
+
+**First generalization result: absorption is NOT specific to first-letter.** The same measurement on
+**last-letter** (Gemma-2-2b, layer 12, 16k) gives a curve of the same shape and comparable — at mid/high
+L0, *higher* — magnitude:
+
+![absorption by property](results/absorption_property_comparison.png)
+
+| L0 | first-letter | last-letter |
+|----|--------------|-------------|
+| 22  | 0.127 | 0.118 |
+| 41  | 0.100 | 0.094 |
+| 82  | 0.034 | 0.064 |
+| 176 | 0.019 | 0.030 |
+| 445 | 0.010 | 0.017 |
+
+Last-letter is still a *letter* property (close to first-letter); the stronger test of generality is
+the **binary** properties (is-capitalized / is-numeric / has-suffix), which need a separate single-class
+orchestration — that's next. See [`PLAN.md`](PLAN.md).
 
 ## Method (from Chanin et al. + their reference code)
 
