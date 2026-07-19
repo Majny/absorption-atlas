@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N abs_prop9b
+#PBS -q gpu
+#PBS -l select=1:ncpus=8:ngpus=1:mem=90gb:gpu_mem=40gb:scratch_local=10gb
+#PBS -l walltime=4:00:00
+#PBS -j oe
+set -uo pipefail
+WORK=/storage/brno2/home/${USER}/absorption-atlas
+export HF_HOME=$WORK/hf_cache MAMBA_ROOT_PREFIX=$WORK/mamba
+[ -f "$WORK/.hf_token" ] && source "$WORK/.hf_token"
+eval "$("$WORK/bin/micromamba" shell hook -s bash)"; micromamba activate abs
+cd "$WORK/sae-spelling"
+python "$WORK/run_property.py" --property first_letter --model google/gemma-2-9b \
+    --layer 20 --width 16000 --target-l0 82 --max-prompts 200 --tag _9b
+echo "rc=$?"

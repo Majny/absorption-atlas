@@ -42,12 +42,10 @@ from sae_spelling.experiments.common import (  # noqa: E402
     DEFAULT_DEVICE,
     SaeInfo,
     create_and_train_probe,
-    get_gemmascope_saes_info,
     get_or_make_dir,
-    load_gemma2_model,
-    load_gemmascope_sae,
     load_probe,
 )
+from model_utils import gemmascope_release, load_model, load_sae, saes_info  # noqa: E402
 from sae_spelling.experiments.feature_absorption import (  # noqa: E402
     ABSORPTION_FEATURE_DELTA_THRESHOLD,
     ABSORPTION_PROBE_COS_THRESHOLD,
@@ -77,8 +75,8 @@ PROPERTIES = {
 }
 
 
-def pick_sae_info(layer: int, width: int, target_l0: int) -> SaeInfo:
-    infos = [s for s in get_gemmascope_saes_info(layer) if s.width == width]
+def pick_sae_info(release: str, layer: int, width: int, target_l0: int) -> SaeInfo:
+    infos = saes_info(release, layer, width)
     if not infos:
         raise SystemExit(f"No SAE for layer={layer} width={width}")
     print(f"  available L0s @ layer{layer}/{width//1000}k: {sorted(s.l0 for s in infos)}")
@@ -104,21 +102,30 @@ def main():
     ap.add_argument("--width", type=int, default=16000)
     ap.add_argument("--target-l0", type=int, default=82)
     ap.add_argument("--max-prompts", type=int, default=200)
+    ap.add_argument("--model", default="google/gemma-2-2b")
+    ap.add_argument("--tag", default="", help="suffix on the output property dir, e.g. _9b")
     ap.add_argument("--results-dir", type=str,
                     default=str(Path(__file__).parent / "results"))
     args = ap.parse_args()
     formatter, base_template, token_pos = PROPERTIES[args.property]
+    release = gemmascope_release(args.model)
 
-    print(f"device = {DEFAULT_DEVICE}; property = {args.property}", flush=True)
-    prop_dir = get_or_make_dir(Path(args.results_dir) / args.property)
+    print(f"device = {DEFAULT_DEVICE}; model = {args.model}; property = {args.property}", flush=True)
+    prop_dir = get_or_make_dir(Path(args.results_dir) / (args.property + args.tag))
     probes_dir = get_or_make_dir(prop_dir / "probes")
     sparse_dir = get_or_make_dir(prop_dir / "k_sparse_probing")
 
-    model = load_gemma2_model()
+    model = load_model(args.model)
     print(f"model loaded (n_layers={model.cfg.n_layers})", flush=True)
     verify_position(model, base_template, token_pos)
 
-    sae_info = pick_sae_info(args.layer, args.width, args.target_l0)
+    # the library's k-sparse helper loads the SAE internally via load_gemmascope_sae (2b-hardcoded);
+    # redirect it to the right model's Gemma Scope release so the 9b path uses the 9b SAE.
+    import sae_spelling.experiments.k_sparse_probing as _ksp  # noqa: E402
+    _ksp.load_gemmascope_sae = (
+        lambda layer, width="16k", l0="canonical", **kw: load_sae(release, layer, width, l0))
+
+    sae_info = pick_sae_info(release, args.layer, args.width, args.target_l0)
     print(f"  -> using {sae_info}", flush=True)
 
     # 1) property-specific 26-class probe (cached)
@@ -168,7 +175,7 @@ def main():
         ig_batch_size=6, ig_interpolation_steps=6, filter_prompts_batch_size=40,
     )
     probe = load_probe(layer=args.layer, probes_dir=probes_dir)
-    sae = load_gemmascope_sae(sae_info.layer, width=sae_info.width, l0=sae_info.l0)
+    sae = load_sae(release, sae_info.layer, sae_info.width, sae_info.l0)
     likely_negs = get_stats_and_likely_false_negative_tokens(auroc_f1_df, sae_info, Path(sparse_dir))
     print(f"running IG-ablation absorption (max {args.max_prompts}/letter)...", flush=True)
     abs_df = calculate_ig_ablation_and_cos_sims(
