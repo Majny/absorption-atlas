@@ -55,11 +55,9 @@ from sklearn.metrics import f1_score, roc_auc_score  # noqa: E402
 from sae_spelling.experiments.common import (  # noqa: E402
     DEFAULT_DEVICE,
     SaeInfo,
-    get_gemmascope_saes_info,
     get_or_make_dir,
-    load_gemma2_model,
-    load_gemmascope_sae,
 )
+from model_utils import gemmascope_release, load_model, load_sae, saes_info  # noqa: E402
 from sae_spelling.experiments.k_sparse_probing import KS, _get_sae_acts, train_sparse_multi_probe  # noqa: E402
 from sae_spelling.feature_absorption_calculator import EPS, FeatureAbsorptionCalculator  # noqa: E402
 from sae_spelling.probing import (  # noqa: E402
@@ -128,8 +126,8 @@ def word_token_pos(model, template: str) -> int:
     return idxs[0] - len(toks)  # negative index from the end
 
 
-def pick_sae_info(layer, width, target_l0) -> SaeInfo:
-    infos = [s for s in get_gemmascope_saes_info(layer) if s.width == width]
+def pick_sae_info(release, layer, width, target_l0) -> SaeInfo:
+    infos = saes_info(release, layer, width)
     if not infos:
         raise SystemExit(f"No SAE for layer={layer} width={width}")
     print(f"  L0s @ L{layer}/{width//1000}k: {sorted(s.l0 for s in infos)}")
@@ -143,21 +141,25 @@ def main():
     ap.add_argument("--width", type=int, default=16000)
     ap.add_argument("--target-l0", type=int, default=82)
     ap.add_argument("--max-prompts", type=int, default=200)
+    ap.add_argument("--model", default="google/gemma-2-2b")
+    ap.add_argument("--tag", default="", help="suffix on the output property dir, e.g. _9b")
     ap.add_argument("--results-dir", type=str, default=str(Path(__file__).parent / "results"))
     args = ap.parse_args()
     cfg = PROPERTIES[args.property]
     predicate, template = cfg["predicate"], cfg["template"]
+    release = gemmascope_release(args.model)
 
-    print(f"device={DEFAULT_DEVICE}; property={args.property}; template={template!r}", flush=True)
-    prop_dir = get_or_make_dir(Path(args.results_dir) / args.property)
+    print(f"device={DEFAULT_DEVICE}; model={args.model}; property={args.property}; template={template!r}",
+          flush=True)
+    prop_dir = get_or_make_dir(Path(args.results_dir) / (args.property + args.tag))
     probes_dir = get_or_make_dir(prop_dir / "probes")
 
-    model = load_gemma2_model()
+    model = load_model(args.model)
     tokenizer = model.tokenizer
     pos = word_token_pos(model, template)
     print(f"model loaded; word_token_pos={pos}", flush=True)
 
-    sae_info = pick_sae_info(args.layer, args.width, args.target_l0)
+    sae_info = pick_sae_info(release, args.layer, args.width, args.target_l0)
     print(f"  -> {sae_info}", flush=True)
     hook = f"blocks.{args.layer}.hook_resid_post"
 
@@ -207,7 +209,7 @@ def main():
     print(f"[probe] binary residual-probe test AUROC = {probe_auroc:.3f}", flush=True)
 
     # ---- 2) 1-class k-sparse probing: does a CLEAN main latent exist? ----
-    sae = load_gemmascope_sae(sae_info.layer, width=sae_info.width, l0=sae_info.l0)
+    sae = load_sae(release, sae_info.layer, sae_info.width, sae_info.l0)
     sae_tr = _get_sae_acts(sae, Xtr, sae_post_act=True)   # (Ntr, d_sae)
     sae_te = _get_sae_acts(sae, Xte, sae_post_act=True)   # (Nte, d_sae)
     l1 = train_sparse_multi_probe(
