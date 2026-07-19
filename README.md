@@ -1,5 +1,8 @@
 # Absorption Atlas
 
+**➡️ Main writeup: [`WRITEUP.md`](WRITEUP.md)** — *Does the SAE-absorption metric over-report for
+non-spelling features?* (a metric-validity note; the honest headline result of this repo).
+
 **Does SAE feature absorption generalize beyond first-letter spelling?**
 
 Sparse autoencoders (SAEs) are meant to decompose a language model's activations into
