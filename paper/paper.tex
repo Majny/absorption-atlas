@@ -166,7 +166,8 @@ bias and reconstruction error.
 A \emph{concept} is a binary or categorical property of the input token with objective ground truth
 (e.g.\ ``the first letter is S,'' or ``the token is capitalized''). For each concept $c$ we train a linear
 probe on the residual stream and take its (unit) weight vector $\hat{\mathbf p}_c$ as the ground-truth
-concept direction. Running $k$-sparse probing over SAE latents identifies the concept's \emph{main
+concept direction, following the linear representation hypothesis that concepts are encoded as directions
+in activation space \citep{park2024linear,elhage2022superposition}. Running $k$-sparse probing over SAE latents identifies the concept's \emph{main
 latent(s)} $M_c\subseteq\{1,\dots,m\}$: the small set that a sparse probe uses to predict $c$, grown by a
 feature-splitting criterion (extend $k$ while validation $F_1$ jumps by at least $0.03$).
 
@@ -231,20 +232,31 @@ metrics} on non-spelling properties, not to touching non-spelling properties at 
 \paragraph{SAE evaluation and its reliability.}
 SAEBench \citep{karvonen2025saebench} standardizes a battery of SAE metrics, including the projection-based
 absorption score we scrutinize, and documents the layer-decay of the ablation metric that we control for.
-A growing line questions whether SAE features are as useful or as principled as hoped: \citet{kantamneni2025saeprobing}
-find SAE latents do not beat raw-activation linear probes on sparse-probing tasks, situating the ``so what''
-we do not provide (a downstream task the mis-measurement would break) inside a live debate about SAE utility.
-Matryoshka SAEs \citep{bussmann2025matryoshka} were introduced specifically to reduce absorption by
-imposing a nested feature hierarchy; a natural extension of our study is whether such mitigations change the
-projection--ablation disagreement, which we leave to future work (\S\ref{sec:concl}).
+A growing line questions whether SAE metrics and features are as reliable or as principled as hoped.
+Closest to our concern, \citet{chanin2026benchmarks} audits SAEBench's own quality metrics and argues that
+several should not be trusted as stated---our result is a small, specific instance of that broader worry,
+aimed at the absorption metric. \citet{leask2025canonical} show SAE features are neither complete nor atomic
+(the same dictionary re-seeded yields different ``units''), and \citet{engels2024darkmatter} characterize a
+systematically-missed error component; both undercut the premise, which absorption is defined against, that
+SAE latents are the canonical units of analysis. On the utility side, \citet{kantamneni2025saeprobing} find
+SAE latents do not beat raw-activation linear probes on sparse-probing tasks, situating the downstream
+``so what'' we do not provide inside a live debate about SAE usefulness. Finally, several architectures
+target absorption directly: Matryoshka SAEs \citep{bussmann2025matryoshka} impose a nested feature
+hierarchy, OrtSAE \citep{korznikov2025ortsae} penalizes decoder cosine similarity, and the recent
+C2R \citep{jin2026c2r} adds a cross-sample consistency regularizer; whether such mitigations change the
+projection--ablation disagreement is a natural extension we leave to future work (\S\ref{sec:concl}).
 
 \paragraph{Representational vs.\ causal evidence.}
-Our headline is an instance of a broader methodological point: representational evidence (a probe or
-projection finding a concept in a direction) need not imply a causal role. This is the standard motivation
-for activation patching and causal-mediation analysis in interpretability, and it is exactly why the
-original absorption metric was causal. Our contribution is the concrete observation that, for a distributed
-structural feature, the representational absorption signal survives while the causal one vanishes even where
-the causal metric is valid.
+Our headline is an instance of a broader methodological point, increasingly emphasized in the field:
+representational evidence (a probe or projection finding a concept in a direction) need not imply a causal
+role, and interpretability claims that rest on it can fail to generalize unless grounded causally
+\citep{joshi2026causality}. \citet{lin2026disclose} argue, in nearly our terms, that many mechanistic
+claims report faithfulness/ablation/monosemanticity as \emph{validation} without stating the assumptions
+that would make them \emph{identifying}---an absorption metric is exactly such a validation, not a causal
+guarantee. This is the standard motivation for activation patching and causal-mediation analysis (e.g.\
+\citealp{meng2022rome}), and it is why the original absorption metric was causal in the first place. Our
+contribution is the concrete observation that, for a distributed structural feature, the representational
+absorption signal survives while the causal one vanishes even where the causal metric is valid.
 
 \section{Methods}\label{sec:methods}
 \paragraph{Models, SAEs, and layers.}
@@ -521,7 +533,9 @@ representational--causal dissociation'': the effect is near-floor and rests on o
 Capitalization is a high-frequency, broadly co-occurring concept. Under feature hedging
 \citep{chanin2025hedging}, a $16$k SAE spreads such a concept across several latents, so that ``one dominant
 latent by projection geometry'' is a weak, partly-geometric artifact rather than a token-aligned absorber
-the model uses. Our funnel (Table~\ref{tab:funnel}) is consistent with this: when the main latent misses a
+the model uses. More broadly, some concepts are represented in genuinely multi-latent or multi-dimensional
+ways \citep{engels2024multidim}, in which case a metric premised on a single absorbing latent is simply the
+wrong instrument, and its ``above-null'' reading reflects geometry rather than a pathology. Our funnel (Table~\ref{tab:funnel}) is consistent with this: when the main latent misses a
 token, the concept is recovered by many small, mostly-unaligned contributions. We cannot fully separate
 ``the projection metric over-reports'' from ``hedging makes the projection metric's premise inapplicable
 here''---but for a practitioner the operational consequence is the same: a projection-flagged single-latent
