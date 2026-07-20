@@ -3,7 +3,7 @@ import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 pts = [
     ("first-letter · 2b", 0.95, 0.032, "#c0392b", "o"),
     ("first-letter · 9b", 0.96, 0.045, "#c0392b", "s"),
-    ("is-capitalized · 2b", 0.60, 0.000, "#2c7fb8", "o"),
+    ("is-capitalized · 2b", 0.59, 0.000, "#2c7fb8", "o"),
     ("is-capitalized · 9b", 0.91, 0.000, "#2c7fb8", "s"),
 ]
 fig, ax = plt.subplots(figsize=(6.6,4.3))

@@ -27,12 +27,22 @@ def boot_ci(booleans, n=5000):
     return (float(np.percentile(means, 2.5)), float(np.percentile(means, 97.5)), float(a.mean()), len(a))
 
 
+def wilson_ci(p, n, z=1.96):
+    """Deterministic Wilson score 95% CI for a proportion p over n trials. Used instead of a
+    synthetic-Bernoulli bootstrap so the reported CI matches the EXACT computed rate (no RNG noise
+    that would drift the point estimate, e.g. 0.123 -> 0.14)."""
+    if n == 0:
+        return (float("nan"), float("nan"))
+    denom = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / denom
+    half = (z / denom) * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    return (max(0.0, centre - half), min(1.0, centre + half))
+
+
 def projection_events(prop, R=3.0):
-    """recompute per-candidate single-dominant probe-direction absorption from the probedir detail
-    (main-silent pool) — returns concept-hit booleans and random-hit booleans."""
+    """report the EXACT single-dominant projection rate and random-null rate from the probedir json
+    (aggregate over the main-silent pool), with a deterministic Wilson CI on the exact rate."""
     d = json.loads((RES / prop / f"probedir_l0{_l0(prop)}.json").read_text())
-    # probedir json only stored aggregate; use the summary's rate as point estimate and reconstruct
-    # Bernoulli sample of size n_main_silent for a CI proxy (exact per-candidate not re-saved here).
     n = d["n_main_silent"]
     p = d["probedir_conditioned_rate"][str(R)]
     pr = d["random_dir_control"][str(R)]
@@ -58,17 +68,14 @@ def behavioral_events(prop_dir, l0):
 
 
 def main():
-    print("=== (1) PROJECTION absorption vs random null (probe-direction, R=3), bootstrap over the "
-          "main-silent pool as Bernoulli(p) ===")
+    print("=== (1) PROJECTION absorption vs random null (probe-direction, R=3), EXACT rate + "
+          "deterministic Wilson 95% CI over the main-silent pool ===")
     for prop in ["first_letter", "is_capitalized"]:
         n, p, pr = projection_events(prop)
-        # Bernoulli CI via Wilson-ish bootstrap on a synthetic sample of size n with success rate p
-        samp = (RNG.random(n) < p).astype(float)
-        lo, hi, m, _ = boot_ci(samp)
-        rsamp = (RNG.random(n) < pr).astype(float)
-        rlo, rhi, rm, _ = boot_ci(rsamp)
-        print(f"  {prop:15} concept={m:.3f} [{lo:.3f},{hi:.3f}]  random={rm:.3f} [{rlo:.3f},{rhi:.3f}]  "
-              f"(n_main_silent={n})")
+        lo, hi = wilson_ci(p, n)
+        rlo, rhi = wilson_ci(pr, n)
+        print(f"  {prop:15} concept={p:.3f} [{lo:.3f},{hi:.3f}]  random={pr:.3f} [{rlo:.3f},{rhi:.3f}]  "
+              f"(n_main_silent={n}, n_absorbed={round(p*n)})")
 
     print("\n=== (2) BEHAVIORAL absorption: 9b first-letter vs 9b is-capitalized (per-candidate is_absorption) ===")
     for tag, l0 in [("first_letter_9b", 68), ("is_capitalized_9b", 68)]:
@@ -86,12 +93,18 @@ def main():
     print("\n=== (3) MATCHED-ACCURACY control (from ICL + corrupt sweeps, first-letter behavioral) ===")
     icl = json.loads((RES / "icl_sweep" / "sweep.json").read_text())
     cor = json.loads((RES / "icl_sweep" / "corrupt_sweep.json").read_text())
-    allpts = [(r["accuracy"], r["behavioral"]) for r in icl] + [(r["accuracy"], r["behavioral"]) for r in cor]
-    near91 = [b for a, b in allpts if 0.86 <= a <= 0.97]
-    print(f"  first-letter behavioral at accuracy 0.86-0.97: {[round(b,4) for b in near91]}  "
-          f"mean={np.mean(near91):.4f}")
-    print(f"  -> at MATCHED accuracy ~0.9, first-letter absorbs ~{np.mean(near91):.3f} behaviorally, "
-          f"while 9b is-capitalized (acc 0.91) absorbs 0.000")
+    allpts = [("icl", r["accuracy"], r["behavioral"]) for r in icl] + \
+             [("corrupt", r["accuracy"], r["behavioral"]) for r in cor]
+    # is-capitalized 9b accuracy is 0.91: bracket it tightly (0.90-0.94) rather than cherry-picking
+    band = [(src, a, b) for src, a, b in allpts if 0.90 <= a <= 0.94]
+    print("  first-letter behavioral at accuracy 0.90-0.94 (brackets the is-cap 9b acc 0.91):")
+    for src, a, b in sorted(band, key=lambda t: t[1]):
+        print(f"    {src:8} acc={a:.3f}  behavioral={b:.4f}")
+    bvals = [b for _, _, b in band]
+    print(f"  -> at MATCHED accuracy ~0.9, first-letter absorbs {min(bvals):.3f}-{max(bvals):.3f} "
+          f"behaviorally (depending on manipulation), while 9b is-capitalized (acc 0.91) absorbs 0.000")
+    print(f"  (note: the single value 0.026 sits at acc 0.97 [corrupt=0.25], NOT ~0.9 — do not pair it "
+          f"with 'matched accuracy ~0.9')")
 
 
 if __name__ == "__main__":

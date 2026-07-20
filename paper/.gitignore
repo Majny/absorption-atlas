@@ -5,4 +5,8 @@
 *.out
 *.fls
 *.fdb_latexmk
+*.toc
 build.log
+compile.log
+compile2.log
+bibtex.log

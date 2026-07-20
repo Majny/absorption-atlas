@@ -13,7 +13,6 @@
 \usepackage{enumitem}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=blue!45!black,urlcolor=blue!45!black]{hyperref}
-\usepackage{siunitx}
 
 \newcommand{\iscap}{\textsf{is-capitalized}}
 \newcommand{\allcaps}{\textsf{all-caps}}
@@ -27,7 +26,7 @@
 \newtheorem{definition}{Definition}
 
 \title{\bfseries Does the Standard Sparse-Autoencoder \\ Feature-Absorption Metric Over-Report for Non-Spelling Features?\\[3pt]
-\large A Cross-Metric, Cross-Model Study of Feature Absorption \\ Beyond First-Letter Spelling}
+\large A Cross-Metric, Cross-Scale Study of Feature Absorption \\ Beyond First-Letter Spelling}
 
 \author{Jakub Dvo\v{r}\'ak\\[2pt]
 \normalsize Faculty of Mathematics and Physics, Charles University, Prague\\
@@ -51,15 +50,17 @@ concept direction into per-latent contributions. We ask a question that has, to 
 been tested: do the two metrics still agree once absorption is measured on a structurally different,
 non-spelling property? Running both metrics on the binary property \iscap{} across Gemma-2-2b and
 Gemma-2-9b (Gemma Scope $16$k SAEs), we find that they \emph{disagree}. The projection metric reports
-single-dominant-latent absorption modestly above its random-direction null ($0.14$, bootstrap $95\%$
-CI $[0.085,0.200]$ vs.\ $0.04$; $n{=}130$, a marginal separation), whereas the ablation metric reports
-exactly zero on $273/273$ candidate tokens, on \emph{both} models. Two controls rule out the mundane
+single-dominant-latent absorption whose point estimate is $3.6\times$ its random-direction null
+($0.12$ vs.\ $0.03$ at the strict dominance ratio $R{=}3$, $n{=}130$; Wilson $95\%$ CI $[0.077,0.191]$,
+which excludes the null point estimate but is marginal at this sample size), whereas the ablation
+metric reports exactly zero absorption on \emph{every} candidate token on both models ($0/727$ on
+Gemma-2-2b, $0/273$ on Gemma-2-9b). Two controls rule out the mundane
 explanations: the zero is not caused by the model failing the task (Gemma-2-9b performs \iscap{} at
-$0.91$ accuracy, versus $0.60$ for 2b, yet ablation absorption stays $0.0$) and not by a dead layer
+$0.91$ accuracy, versus $0.59$ for 2b, yet ablation absorption stays $0.0$) and not by a dead layer
 (at the same 9b layer the ablation metric fires at $0.045$ for spelling, and at \emph{matched} task
-accuracy it fires at ${\sim}0.026$ for spelling while \iscap{} remains $0.0$). We conclude that the
-field-standard projection metric appears to over-report single-latent absorption for a distributed
-structural feature that has no causal correlate. As a secondary, controlled result, we show---through
+accuracy ${\sim}0.9$ it fires at ${\sim}0.017$--$0.035$ for spelling while \iscap{} remains $0.0$). We
+conclude that the field-standard projection metric appears to over-report single-latent absorption for
+a distributed structural feature that has no single-latent causal correlate. As a secondary, controlled result, we show---through
 two independent task-accuracy manipulations---that ablation-based absorption is itself sensitive to
 task performance, whereas the projection metric is not. We reproduce first-letter absorption and its
 dependence on SAE sparsity as pipeline validation. Effects are near-floor and the study spans one
@@ -77,7 +78,7 @@ human-understandable parts, both as basic science and as a foundation for auditi
 whose capabilities are hard to trust by behavior alone. A central obstacle is \emph{superposition}: models
 appear to represent far more features than they have neurons, packing them into linear combinations of
 directions rather than into individual units \citep{elhage2022superposition}. Sparse autoencoders (SAEs)
-are the leading proposed remedy: by learning an overcomplete, sparsely-activating dictionary that
+are the leading proposed remedy: by learning an overcomplete, sparsely activating dictionary that
 reconstructs a model's activations, they aim to recover the underlying features as individual, monosemantic
 latents \citep{bricken2023monosemanticity,cunningham2023sparse,templeton2024scaling}. Open SAE suites such
 as Gemma Scope \citep{lieberum2024gemmascope} have made this decomposition available at scale and turned SAE
@@ -101,7 +102,8 @@ ground truth. Benchmarks instantiate absorption on first-letter spelling and not
 absorption unrelated to character identification'' as open. Second, two different metrics are in use. The
 original \citep{chanin2024absorption} is \emph{causal}: it uses attribution to ask whether a single latent
 actually mediates the model's answer. SAEBench \citep{karvonen2025saebench} standardized a
-\emph{representational} alternative that decomposes the residual stream's projection onto a concept
+\emph{representational} alternative---a projection view already present in \citet{chanin2024absorption}---
+that decomposes the residual stream's projection onto a concept
 direction into per-latent contributions, adopting it because the causal/ablation signal ``goes to zero in
 later layers.'' The representational metric is now the field standard; the ablation metric is effectively
 deprecated.
@@ -129,8 +131,9 @@ artifact nor a dead-layer artifact.
   to our knowledge, the first \emph{direct contrast of the two absorption metrics} on such features
   (\S\ref{sec:related}).
   \item \textbf{A metric disagreement, with confidence intervals.} For \iscap{}, projection reports
-  above-null absorption while ablation reports zero on $273$ candidate tokens; we report bootstrap CIs and
-  candidate counts throughout, because the effect is near-floor (\S\ref{sec:proj},\,\ref{sec:abl}).
+  above-null absorption while ablation reports zero on \emph{every} candidate token ($0/727$ on
+  Gemma-2-2b, $0/273$ on Gemma-2-9b); we report CIs and candidate counts throughout, because the effect
+  is near-floor (\S\ref{sec:proj},\,\ref{sec:abl}).
   \item \textbf{Controls that isolate the cause.} A cross-model task-ability control and a layer- and
   accuracy-matched spelling control together rule out both ``the model cannot do the task'' and ``the layer
   is dead'' (\S\ref{sec:controls}).
@@ -138,8 +141,8 @@ artifact nor a dead-layer artifact.
   show ablation-based absorption tracks task performance while the projection metric does not
   (\S\ref{sec:mech}).
   \item \textbf{Reproducibility and honesty.} We release all code, a model-agnostic re-implementation used
-  for the cross-model controls, an independently review-verified single-class metric port, and an appendix
-  (\ref{app:rejected}) documenting three hypotheses we built controls to test and rejected.
+  for the cross-model controls, an independently review-verified single-class metric port, and
+  Appendix~\ref{app:rejected}, which documents three hypotheses we built controls to test and rejected.
 \end{enumerate}
 
 We emphasize up front that the result is small: the effects are near-floor, only one structural property is
@@ -205,7 +208,7 @@ it means ``ablation reads zero'' is, in later layers, a known artifact.
 Because SAE codes are sparse, at any token the projection~\eqref{eq:proj} is dominated by whichever few
 latents are active; ``one dominant latent'' can therefore arise partly from sparsity geometry rather than
 from concept-specific absorption. We control for this with a \emph{random-direction null} (replace
-$\hat{\mathbf p}_c$ by random unit directions) and with a scale-free \emph{dominance ratio} $R$: a token is
+$\hat{\mathbf p}_c$ with random unit directions) and with a scale-free \emph{dominance ratio} $R$: a token is
 ``single-dominant'' iff $c_{(1)}\ge R\,c_{(2)}$ for the top two contributions. We report rates at
 $R\in\{1.5,2,3\}$ and condition on the main-latent-silent pool, so the rate does not bake in main-latent
 quality (Appendix~\ref{app:rejected} explains why this matters).
@@ -222,9 +225,9 @@ studies a property of the \emph{evaluation} of their features.
 \citet{chanin2024absorption} define feature splitting (a latent fragments into several as width grows) and
 the pathological special case of absorption, giving the ablation metric and the first-letter benchmark.
 \citet{chanin2025hedging} describe \emph{feature hedging}: when correlated features co-occur, a narrow SAE
-merges them into distributed, partly-polysemantic latents. Hedging is directly relevant to us: it is the
+merges them into distributed, partly polysemantic latents. Hedging is directly relevant to us: it is the
 most natural mechanism by which a broadly co-occurring concept such as capitalization would be
-\emph{represented but distributed}, so that a ``single dominant latent'' is a weak, partly-geometric signal
+\emph{represented but distributed}, so that a ``single dominant latent'' is a weak, partly geometric signal
 rather than a token-aligned absorber. Notably, \citet{chanin2025hedging} already probe part-of-speech with
 $k$-sparse probing, which is why we restrict our novelty claim to the \emph{contrast of the two absorption
 metrics} on non-spelling properties, not to touching non-spelling properties at all.
@@ -232,13 +235,13 @@ metrics} on non-spelling properties, not to touching non-spelling properties at 
 \paragraph{SAE evaluation and its reliability.}
 SAEBench \citep{karvonen2025saebench} standardizes a battery of SAE metrics, including the projection-based
 absorption score we scrutinize, and documents the layer-decay of the ablation metric that we control for.
-A growing line questions whether SAE metrics and features are as reliable or as principled as hoped.
+A growing line of work questions whether SAE metrics and features are as reliable or as principled as hoped.
 Closest to our concern, \citet{chanin2026benchmarks} audits SAEBench's own quality metrics and argues that
 several should not be trusted as stated---our result is a small, specific instance of that broader worry,
 aimed at the absorption metric. \citet{leask2025canonical} show SAE features are neither complete nor atomic
 (the same dictionary re-seeded yields different ``units''), and \citet{engels2024darkmatter} characterize a
-systematically-missed error component; both undercut the premise, which absorption is defined against, that
-SAE latents are the canonical units of analysis. On the utility side, \citet{kantamneni2025saeprobing} find
+systematically missed error component; both undercut the very premise that absorption is defined against:
+that SAE latents are the canonical units of analysis. On the utility side, \citet{kantamneni2025saeprobing} find
 SAE latents do not beat raw-activation linear probes on sparse-probing tasks, situating the downstream
 ``so what'' we do not provide inside a live debate about SAE usefulness. Finally, several architectures
 target absorption directly: Matryoshka SAEs \citep{bussmann2025matryoshka} impose a nested feature
@@ -250,7 +253,7 @@ projection--ablation disagreement is a natural extension we leave to future work
 Our headline is an instance of a broader methodological point, increasingly emphasized in the field:
 representational evidence (a probe or projection finding a concept in a direction) need not imply a causal
 role, and interpretability claims that rest on it can fail to generalize unless grounded causally
-\citep{joshi2026causality}. \citet{lin2026disclose} argue, in nearly our terms, that many mechanistic
+\citep{joshi2026causality}. \citet{lin2026disclose} argue, in almost exactly our terms, that many mechanistic
 claims report faithfulness/ablation/monosemanticity as \emph{validation} without stating the assumptions
 that would make them \emph{identifying}---an absorption metric is exactly such a validation, not a causal
 guarantee. This is the standard motivation for activation patching and causal-mediation analysis (e.g.\
@@ -261,24 +264,30 @@ absorption signal survives while the causal one vanishes even where the causal m
 \section{Methods}\label{sec:methods}
 \paragraph{Models, SAEs, and layers.}
 We use Gemma-2-2b at residual-stream layer $12$ and Gemma-2-9b at layer $20$, each with the Gemma Scope
-JumpReLU residual SAE of width $16$k at an average $L_0$ near $70$--$82$. Both layers sit well below the
+JumpReLU residual SAE of width $16$k at an average $L_0$ near $68$--$82$. Both layers sit well below the
 depth at which the ablation metric is known to fail. All activations are read at the word-token position of
 an in-context prompt.
 
 \paragraph{Properties.}
 Concepts are elicited by in-context tasks with objective, tokenizer-derivable labels over the set of
-single-token, purely-alphabetic vocabulary items ($\approx 1.7\times10^5$ tokens). We study two spelling
+single-token, purely alphabetic vocabulary items ($\approx 1.7\times10^5$ tokens). We study two spelling
 concepts---first-letter and last-letter (26-way)---and four binary structural concepts: \iscap{} (begins
 with an uppercase letter), \allcaps{} (all uppercase), \suffing{}, and \suffed{}. Only \iscap{} yields a
-well-powered candidate pool ($n{=}130$--$273$); \allcaps{} and the suffix properties yield $n{=}9$--$33$ and
-are reported as anecdotes, not evidence. \textsf{is-numeric} was dropped because Gemma's vocabulary contains
+well-powered candidate pool ($727$ candidate false negatives on Gemma-2-2b, $273$ on Gemma-2-9b);
+\allcaps{} and the suffix properties yield $n{=}9$--$33$ and are reported as anecdotes, not evidence. \textsf{is-numeric} was dropped because Gemma's vocabulary contains
 almost no pure-digit single tokens---itself a label-availability limit worth recording.
 
 \paragraph{Pipeline.}
 For each concept we (1) train a linear probe on the residual stream at the word position; (2) run $k$-sparse
 probing to obtain the main latents $M_c$ via the feature-splitting $F_1$ criterion; and (3) collect the
 candidate false negatives---tokens where the probe fires and the true label holds but $M_c$'s sparse probe
-does not. Absorption is then computed on these candidates by each metric. For binary properties we use a
+does not. Absorption is then computed on these candidates by each metric. The candidate pool size varies by
+model and metric, and we report the relevant $n$ with every rate: for \iscap{} there are $727$ candidate
+false negatives on Gemma-2-2b, of which a sample of $200$ enters the ablation funnel
+(Table~\ref{tab:funnel}) and the $130$ that are additionally main-latent-silent enter the conditioned
+projection rate (Table~\ref{tab:proj}); on Gemma-2-9b there are $273$ candidates. The projection and
+ablation rates for a given model are therefore computed on the \emph{same} candidate set, with the
+projection metric further conditioned on the main-silent subset. For binary properties we use a
 single-class re-implementation of the 26-way pipeline; it was independently reviewed for faithfulness to the
 reference implementation (a line-by-line check of candidate selection, the denominator, and the
 absorption predicate).
@@ -286,7 +295,7 @@ absorption predicate).
 \paragraph{Ablation metric.}
 We follow \citet{chanin2024absorption}: on each candidate, integrated-gradient attribution of SAE latents to
 the task logit-difference, counting a token as absorbed if the main latents are silent, the single
-most-causal latent is clearly dominant (an additive attribution-gap threshold), and it is probe-aligned
+most causal latent is clearly dominant (an additive attribution-gap threshold), and it is probe-aligned
 ($\cos\ge 0.025$). The rate is (absorbed / probe-true-positives). For the binary True/False tasks the metric
 is the True-minus-False answer-logit.
 
@@ -306,16 +315,20 @@ corrupting a deterministic fraction of in-context answers, so spelling and struc
 compared at equal accuracy.
 
 \paragraph{Statistics and implementation.}
-All rates carry bootstrap $95\%$ confidence intervals (binomial resampling over the candidate pool), and we
-report candidate counts everywhere because effects are near-floor. Experiments ran on a single NVIDIA A100
+All rates carry $95\%$ confidence intervals---Wilson score intervals for the conditioned projection rates
+and exact/binomial intervals for the behavioral rates---and we report candidate counts everywhere because
+effects are near-floor. Experiments ran on a single NVIDIA A100
 (40\,GB) via a GPU cluster; Gemma-2-9b runs in bf16. Appendix~\ref{app:repro} gives the full configuration.
 
 \section{Results}\label{sec:results}
 
-\subsection{Reproduction and the L0 law}\label{sec:repro}
+\subsection{Reproduction and the $L_0$ law}\label{sec:repro}
 As pipeline validation we first reproduce first-letter absorption on current Gemma Scope SAEs and recover
-its known dependence on SAE sparsity: absorption rises steeply as $L_0$ falls
-(Figure~\ref{fig:l0}, Table~\ref{tab:l0}), and sits a consistent factor below SAEBench's own JumpReLU
+its known dependence on SAE sparsity. Here and in Table~\ref{tab:l0} the metric is the \emph{ablation}
+full-absorption rate (SAEBench's \code{mean\_full\_absorption\_score}, computed over probe true positives),
+so it is directly comparable to the SAEBench reference but is a different quantity, on a different scale,
+from the conditioned single-dominant projection rate of \S\ref{sec:proj}. Absorption rises steeply as $L_0$
+falls (Figure~\ref{fig:l0}, Table~\ref{tab:l0}), and sits a consistent factor below SAEBench's own JumpReLU
 numbers---as expected for the more thoroughly trained Gemma Scope SAEs. Last-letter behaves like first-letter
 (Figure~\ref{fig:prop}), so within the spelling family the phenomenon is not specific to the first character.
 
@@ -336,8 +349,10 @@ numbers---as expected for the more thoroughly trained Gemma Scope SAEs. Last-let
 
 \begin{table}[t]
   \centering
-  \caption{Mean absorption rate vs.\ SAE sparsity $L_0$ (Gemma-2-2b, layer 12, width 16k). Both spelling
-  properties decrease monotonically with $L_0$.}\label{tab:l0}
+  \caption{Mean ablation full-absorption rate (SAEBench \code{mean\_full\_absorption\_score}, over probe
+  true positives) vs.\ SAE sparsity $L_0$ (Gemma-2-2b, layer 12, width $16$k)---a different quantity, on a
+  different scale, from the conditioned single-dominant projection rate of Table~\ref{tab:proj}. Both
+  spelling properties decrease monotonically with $L_0$.}\label{tab:l0}
   \begin{tabular}{lccccc}
     \toprule
     $L_0$ & 22 & 41 & 82 & 176 & 445 \\
@@ -352,8 +367,10 @@ numbers---as expected for the more thoroughly trained Gemma Scope SAEs. Last-let
 Table~\ref{tab:proj} and Figure~\ref{fig:probedir} report the projection metric with its random-direction
 null across dominance thresholds. For spelling, projection absorption is large and far above the null at
 every $R$ (e.g.\ $0.53$ vs.\ $0.04$ at $R{=}3$). For \iscap{}, projection absorption is above the null but
-\emph{marginal} at $n{=}130$ ($0.12$ at $R{=}3$; bootstrap CI on the strict rate $[0.085,0.200]$ vs.\ null
-$[0.008,0.077]$, Table~\ref{tab:proj-ci}) and roughly $4\times$ weaker than spelling. The remaining
+\emph{marginal} at $n{=}130$: the strict $R{=}3$ rate is $0.12$ against a null of $0.03$ (a $3.6\times$
+ratio), and its Wilson $95\%$ CI $[0.077,0.191]$ excludes the null point estimate but is wide at this
+sample size (Table~\ref{tab:proj-ci}); a direct paired-difference test, which we do not run here, would be
+needed to establish the separation firmly. It is also roughly $4\times$ weaker than spelling. The remaining
 structural properties point the same way but are underpowered ($n{=}9$--$16$) and we do not lean on them.
 Read alone, the projection metric therefore says: structural concepts show weak-but-present single-latent
 absorption.
@@ -384,14 +401,15 @@ absorption.
   \centering
   \includegraphics[width=0.6\textwidth]{figures/probedir.png}
   \caption{Projection absorption vs.\ a random-direction sparsity baseline at the strict $R{=}3$. Spelling
-  (red) is $13$--$14\times$ above the null; \iscap{} is $\sim$$3.6\times$ above (robust anchor); the other
-  structural properties are above the null but underpowered ($\ast$).}\label{fig:probedir}
+  (red) is $13$--$14\times$ above the null; \iscap{} is $\sim$$3.6\times$ above---the one well-powered
+  structural pool, though the separation is still marginal at $n{=}130$; the other structural properties are
+  above the null but underpowered ($\ast$).}\label{fig:probedir}
 \end{figure}
 
 \subsection{The ablation metric reports a clean zero}\label{sec:abl}
-The ablation metric tells the opposite story. For \iscap{} it reports absorption of exactly $0.0$---on
-Gemma-2-2b (with $727$ candidate false negatives) and on Gemma-2-9b ($0/273$ candidates; binomial $95\%$ CI
-$[0,0.011]$). The probe and main latent are excellent in both cases (probe AUROC $\approx 1.00$, $k$-sparse
+The ablation metric tells the opposite story. For \iscap{} it reports absorption of exactly $0.0$ on every
+candidate token---$0/727$ on Gemma-2-2b and $0/273$ on Gemma-2-9b (binomial $95\%$ CI $[0,0.011]$ for the
+9b pool). The probe and main latent are excellent in both cases (probe AUROC $\approx 1.00$, $k$-sparse
 $F_1\approx 0.99$), so this is not a failure to find the concept---the concept is cleanly present and cleanly
 detectable; it simply is not carried causally by a single absorbing latent.
 
@@ -408,7 +426,7 @@ latent'' criterion counts as (weak) absorption but the causal criterion does not
   \centering
   \caption{Ablation-metric drop-out funnel on Gemma-2-2b (layer 12). For each binary property we show the
   probe/latent quality, the candidate pool, and how many sampled main-silent candidates pass each successive
-  criterion (most-negative-attribution latent; probe-aligned; both). Almost all candidates have a causal
+  criterion (most-negative-attribution latent; probe-aligned). Almost all candidates have a causal
   latent, but few are concept-aligned, and the final single-dominant absorption rate is $0.0$ throughout.}
   \label{tab:funnel}
   \small
@@ -428,8 +446,8 @@ latent'' criterion counts as (weak) absorption but the causal criterion does not
 The decisive worry is that the ablation zero is the known later-layer artifact rather than a genuine absence
 of causal absorption. Two controls rule this out (Table~\ref{tab:cross}, Figure~\ref{fig:cross}).
 
-\emph{Task ability.} Gemma-2-9b performs \iscap{} at $0.91$ in-context accuracy, versus $0.60$ for
-Gemma-2-2b (Appendix~\ref{app:extended}, Table~\ref{tab:acc}). If the zero were because the model could not
+\emph{Task ability.} Gemma-2-9b performs \iscap{} at $0.91$ in-context accuracy, versus $0.59$ for
+Gemma-2-2b (both from the balanced-ICL row of Appendix~\ref{app:extended}, Table~\ref{tab:acc}). If the zero were because the model could not
 do the task and so provided no behavioral signal to attribute, it should lift on 9b. It does not: 9b \iscap{}
 ablation absorption is again $0.0$, on all $273$ candidates.
 
@@ -438,20 +456,22 @@ higher than 2b's $0.032$---so the ablation metric demonstrably fires at that ope
 therefore specific to the structural property, not the layer.
 
 \emph{Matched accuracy.} Finally, using the accuracy sweep of \S\ref{sec:mech}, at matched task accuracy
-${\sim}0.9$ first-letter ablation absorption is ${\sim}0.026$ while \iscap{} is $0.0$. So even holding task
-ability fixed, spelling absorbs and \iscap{} does not.
+${\sim}0.9$ (bracketing the 9b \iscap{} accuracy of $0.91$) first-letter ablation absorption is
+${\sim}0.017$--$0.035$ depending on the manipulation (Tables~\ref{tab:iclsweep}--\ref{tab:corrupt}: ICL
+gives $0.035$ at accuracy $0.92$, corrupted-ICL gives $0.017$ at accuracy $0.93$), while \iscap{} is $0.0$.
+So even holding task ability fixed, spelling absorbs and \iscap{} does not.
 
 \begin{table}[t]
   \centering
   \caption{Cross-model ablation (behavioral) absorption. Spelling absorbs on both models; \iscap{} on
-  neither, even as its task accuracy rises from $0.60$ (2b) to $0.91$ (9b).}\label{tab:cross}
+  neither, even as its task accuracy rises from $0.59$ (2b) to $0.91$ (9b).}\label{tab:cross}
   \begin{tabular}{llcc}
     \toprule
     property & model / layer & task accuracy & ablation absorption \\
     \midrule
     first-letter & Gemma-2-2b / L12 & ${\sim}0.95$ & 0.032 \\
     first-letter & Gemma-2-9b / L20 & ${\sim}0.96$ & 0.045 \\
-    \iscap{}     & Gemma-2-2b / L12 & 0.60 & 0.000 \\
+    \iscap{}     & Gemma-2-2b / L12 & 0.59 & 0.000 \\
     \iscap{}     & Gemma-2-9b / L20 & 0.91 & 0.000 \\
     \bottomrule
   \end{tabular}
@@ -461,7 +481,7 @@ ability fixed, spelling absorbs and \iscap{} does not.
   \centering
   \includegraphics[width=0.6\textwidth]{figures/crossmodel.png}
   \caption{The structural (blue) behavioral-absorption zero persists even as the model's task accuracy rises
-  from $0.60$ to $0.91$, while spelling (red) absorbs on both models---so the zero is not a task-performance
+  from $0.59$ to $0.91$, while spelling (red) absorbs on both models---so the zero is not a task-performance
   artifact.}\label{fig:cross}
 \end{figure}
 
@@ -472,9 +492,10 @@ two independent ways and watching both metrics (Tables~\ref{tab:iclsweep}--\ref{
 Figure~\ref{fig:mech}). Reducing the number of in-context examples from $10$ to $0$ drops accuracy from
 $0.95$ to $0.53$ and ablation absorption from $0.030$ to $0.011$; corrupting a growing fraction of
 in-context answers drops accuracy from $0.97$ to $0.80$ and ablation absorption from $0.030$ to $0.013$. In
-both manipulations ablation absorption tracks accuracy, while the projection rate stays flat at ${\sim}0.60$
-throughout. The ablation metric thus conflates ``the concept is causally absorbed'' with ``the model
-performs the task''; the projection metric does not. This both (i) validates our decision to control task
+both manipulations ablation absorption tracks accuracy, while the projection rate is nearly flat---a small,
+same-direction dip from $0.62$ to $0.59$, and to $0.55$ at zero-shot, far smaller than ablation's
+${\sim}2\times$ swing. The ablation metric thus largely conflates ``the concept is causally absorbed'' with
+``the model performs the task''; the projection metric barely does. This both (i) validates our decision to control task
 accuracy in \S\ref{sec:controls} and (ii) is a small, reusable caveat for anyone comparing ablation
 absorption across settings of differing difficulty.
 
@@ -526,17 +547,26 @@ above chance, yet there is no causal single-latent correlate: the ablation metri
 demonstrably works for spelling and where the model performs the task---reports a clean zero. The narrow,
 checkable claim is therefore that the projection metric appears to \emph{over-report} single-latent
 absorption for a distributed structural feature whose concept direction is present in the residual but not
-concentrated in one causally-load-bearing latent. We deliberately avoid the grander phrase ``a
+concentrated in one causally load-bearing latent. We deliberately avoid the grander phrase ``a
 representational--causal dissociation'': the effect is near-floor and rests on one well-powered property.
+We are also precise about what the ablation zero does and does not show. The ablation metric is, by
+construction, a \emph{single-latent} detector---it counts a token only when one latent both dominates the
+attribution and aligns with the probe. Its zero is therefore not evidence that capitalization has no causal
+mechanism (the model demonstrably computes the answer); it is evidence that no \emph{single} latent
+absorbs the concept---which is exactly the object the projection metric claims to have found.
 
 \paragraph{The most likely mechanism, stated plainly: feature hedging.}
 Capitalization is a high-frequency, broadly co-occurring concept. Under feature hedging
 \citep{chanin2025hedging}, a $16$k SAE spreads such a concept across several latents, so that ``one dominant
-latent by projection geometry'' is a weak, partly-geometric artifact rather than a token-aligned absorber
-the model uses. More broadly, some concepts are represented in genuinely multi-latent or multi-dimensional
+latent by projection geometry'' is a weak, partly geometric artifact rather than a token-aligned absorber
+the model uses. We stress that this does not make our result a restatement of hedging: hedging predicts that
+capitalization is \emph{represented} in a distributed way, but it does not by itself establish that the
+field-standard absorption \emph{metric} scores that distributed representation as single-latent absorption,
+nor that the ablation metric denies it---the metric-level disagreement is the specific thing our cross-metric
+contrast demonstrates. More broadly, some concepts are represented in genuinely multi-latent or multi-dimensional
 ways \citep{engels2024multidim}, in which case a metric premised on a single absorbing latent is simply the
 wrong instrument, and its ``above-null'' reading reflects geometry rather than a pathology. Our funnel (Table~\ref{tab:funnel}) is consistent with this: when the main latent misses a
-token, the concept is recovered by many small, mostly-unaligned contributions. We cannot fully separate
+token, the concept is recovered by many small, mostly unaligned contributions. We cannot fully separate
 ``the projection metric over-reports'' from ``hedging makes the projection metric's premise inapplicable
 here''---but for a practitioner the operational consequence is the same: a projection-flagged single-latent
 absorption for a distributed feature should not be trusted without causal confirmation.
@@ -545,7 +575,7 @@ absorption for a distributed feature should not be trusted without causal confir
 Absorption scores are used to compare SAEs and to motivate architectures such as Matryoshka
 \citep{bussmann2025matryoshka}. If the projection metric over-reports for distributed features, then
 absorption comparisons that include non-spelling concepts could reward or penalize SAEs for a
-partly-geometric signal. Our result is a small piece of evidence for a general prudence already visible in
+partly geometric signal. Our result is a small piece of evidence for a general prudence already visible in
 the field \citep{kantamneni2025saeprobing}: representational SAE metrics benefit from causal cross-checks.
 
 \section{Limitations and Threats to Validity}\label{sec:limits}
@@ -558,6 +588,10 @@ We state the weaknesses plainly.
   have $n{=}9$--$33$ and are anecdotal. ``Property-type-dependent'' is effectively an $n{=}1$ claim.
   \item \textbf{One model family, one SAE recipe.} Both models are Gemma-2 (cross-\emph{scale} only), all
   SAEs are Gemma Scope JumpReLU. We run no non-JumpReLU or Matryoshka SAE and no non-Gemma model.
+  \item \textbf{A single SAE per site, no seed variation.} We use one Gemma Scope SAE per (model, layer) and
+  do not vary the training seed. Because re-seeded SAEs need not recover the same latents
+  \citep{leask2025canonical}, the single-latent projection signal we scrutinize could itself shift across
+  seeds---which, if anything, further undercuts treating it as a stable property of the concept.
   \item \textbf{No downstream consequence.} We do not exhibit a task in which trusting the projection-flagged
   absorption would demonstrably mislead---the ``so what'' that would turn a caveat into an actionable finding.
   \item \textbf{Metric operationalization.} The dominance threshold and the alignment cutoff are choices; we
@@ -570,7 +604,7 @@ standard metrics. For \iscap{}, the projection (representational) metric reports
 single-latent absorption that the ablation (causal) metric denies, and controls show the denial is neither a
 task-performance nor a dead-layer artifact. The most likely mechanism is feature hedging, and the honest
 headline is a metric-validity caveat: representational absorption signals for distributed structural
-features can lack a causal correlate.
+features can lack a single-latent causal correlate.
 
 Three concrete steps would turn this single marginal case into a robust, transferable claim, in rough order
 of leverage: (1) establish the projection--ablation disagreement on a \emph{second SAE recipe} (e.g.\ TopK,
@@ -579,7 +613,7 @@ to test whether an absorption-mitigating architecture changes the disagreement; 
 structural property (e.g.\ is-plural or is-past-tense at $n>130$), so the effect is property-type-general
 rather than a capitalization quirk; and (3) exhibit one \emph{downstream decision}---a probing, steering, or
 unlearning use-case---that the mis-measurement would flip. Until then, we offer the result as a controlled,
-honestly-scoped caveat rather than a discovery.
+honestly scoped caveat rather than a discovery.
 
 \paragraph{Reproducibility.}
 All code, figures, and per-run numbers behind every claim are in the accompanying \code{absorption-atlas}
@@ -590,7 +624,7 @@ review-verified single-class absorption pipeline. Appendix~\ref{app:repro} lists
 \section{Reproducibility details}\label{app:repro}
 \textbf{Models.} \code{google/gemma-2-2b} (26 layers, $d{=}2304$) at layer 12; \code{google/gemma-2-9b}
 (42 layers, $d{=}3584$) at layer 20, loaded via TransformerLens in bf16.
-\textbf{SAEs.} Gemma Scope residual JumpReLU SAEs, width 16k, loaded through SAELens; 2b at $L_0\approx 82$,
+\textbf{SAEs.} Gemma Scope residual JumpReLU SAEs, width $16$k, loaded through SAELens; 2b at $L_0\approx 82$,
 9b at $L_0\approx 68$ (nearest available to a target of 82). The L0 sweep uses the per-$L_0$ 2b releases at
 $L_0\in\{22,41,82,176,445\}$.
 \textbf{Probes.} One-vs-rest linear probe on \code{hook\_resid\_post} activations, $50$ epochs, Adam,
@@ -600,7 +634,9 @@ over post-ReLU SAE activations; main-latent set grown while validation $F_1$ jum
 additive attribution-gap threshold $1.0$ for the reference 26-way metric (we report a threshold/$R$ sweep for
 the binary port). \textbf{Projection metric.} Contributions of Eq.~\eqref{eq:proj} at the word position;
 dominance ratios $R\in\{1.5,2,3\}$; random-direction null averaged over $5$ draws. \textbf{Statistics.}
-Bootstrap $95\%$ CIs, $5000$ resamples over the candidate pool. \textbf{Hardware.} One NVIDIA A100 40\,GB.
+$95\%$ CIs are Wilson score intervals for the conditioned projection rates (reported on the exact
+main-silent counts) and exact binomial intervals for the behavioral rates. \textbf{Hardware.} One NVIDIA
+A100 40\,GB.
 
 \section{Extended tables}\label{app:extended}
 Table~\ref{tab:proj-ci} gives bootstrap CIs for the strict ($R{=}3$) projection rates. Table~\ref{tab:acc}
@@ -609,14 +645,18 @@ performs the task well under every format while 2b is stuck near chance.
 
 \begin{table}[h]
   \centering
-  \caption{Strict ($R{=}3$) projection absorption with bootstrap $95\%$ CIs vs.\ the random-direction null.}
+  \caption{Strict ($R{=}3$) projection absorption with Wilson score $95\%$ CIs vs.\ the random-direction
+  null. The null rate is a mean over five random directions, so its single-direction Wilson interval is
+  conservative; the \iscap{} projection interval nonetheless excludes the null \emph{point} estimate, though
+  its lower bound ($0.077$) sits just above the null ($0.034$)---the separation is real but slim at
+  $n{=}130$.}
   \label{tab:proj-ci}
   \begin{tabular}{lccc}
     \toprule
     property & projection [95\% CI] & random null [95\% CI] & $n$ \\
     \midrule
-    first-letter & 0.54\ [0.51,\,0.56] & 0.04\ [0.03,\,0.05] & 2085 \\
-    \iscap{}     & 0.14\ [0.085,\,0.200] & 0.04\ [0.008,\,0.077] & 130 \\
+    first-letter & 0.53\ [0.51,\,0.55] & 0.04\ [0.03,\,0.05] & 2085 \\
+    \iscap{}     & 0.12\ [0.077,\,0.191] & 0.03\ [0.014,\,0.081] & 130 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -647,7 +687,7 @@ built purpose-made experiments to test and then rejected. Each was discarded on 
   \item \textbf{``Absorption is spelling-specific.''} An early reading of the raw numbers---structural
   ablation absorption $\approx 0$ vs.\ spelling $\approx 0.05$---suggested a contrarian claim that absorption
   simply does not generalize beyond character identification. \emph{Rejected:} a task-validity check showed
-  Gemma-2-2b barely performs the binary tasks (\iscap{} accuracy $0.60$), so the ablation zero could be a
+  Gemma-2-2b barely performs the binary tasks (\iscap{} accuracy $0.59$), so the ablation zero could be a
   missing-behavioral-signal artifact; and the projection metric with a random-direction null showed
   structural absorption \emph{is} present above chance. The clean ``spelling-specific'' claim did not survive.
   \item \textbf{``The structural zero is a task-validity artifact.''} The natural next hypothesis was that
