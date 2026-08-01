@@ -7,7 +7,7 @@ in the literature almost entirely on the *first-letter spelling* task. I run the
 metrics — the **projection** metric (the current SAEBench standard) and the older **ablation/behavioral**
 metric — on a structurally different property, **is-capitalized**. The two metrics *disagree*: the
 projection metric reports single-dominant-latent absorption modestly above its own random-direction null
-(0.14 vs 0.04, R=3), while the ablation metric reports **exactly zero** on **273/273** candidate tokens,
+(0.12 vs 0.03, R=3), while the ablation metric reports **exactly zero** on **273/273** candidate tokens,
 on **both** Gemma-2-2b and Gemma-2-9b. Two controls rule out the boring explanations — it is **not** the
 model failing the task (9b does is-capitalized at 0.91 accuracy, still 0.0) and **not** a dead layer (at
 the same 9b layer/L0, the ablation metric fires at 0.045 for spelling; at matched task accuracy ~0.9 it
@@ -48,7 +48,7 @@ main-latent-silent candidate pool:**
 | property | projection | random-direction null |
 |---|---|---|
 | first-letter | **0.54** [0.51, 0.56] (n=2085) | 0.04 [0.03, 0.05] |
-| is-capitalized | **0.14** [0.085, 0.200] (n=130) | 0.04 [0.008, 0.077] |
+| is-capitalized | **0.12** [0.077, 0.191] (n=130) | 0.03 [0.014, 0.081] |
 
 So projection reports above-null absorption for is-capitalized — but **marginally** (the CIs barely
 separate at n=130) and ~4× weaker than spelling.
@@ -90,7 +90,7 @@ relative to ablation, and the disagreement survives task-ability and layer contr
 ## Limitations (stated, not hidden)
 
 - **Near-floor effects.** Spelling behavioral absorption is only ~0.01–0.05 anywhere; the projection
-  is-capitalized signal (0.14) is marginal above its null. Small numbers.
+  is-capitalized signal (0.12) is marginal above its null. Small numbers.
 - **One structural property.** is-capitalized is the only well-powered one; all-caps/suffix are n=9–33.
   "Property-type-dependent" is really n=1 until more properties are powered up.
 - **One model family, one SAE recipe.** 2b + 9b are cross-*scale* within Gemma-2; only Gemma Scope /

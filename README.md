@@ -1,6 +1,9 @@
 # Absorption Atlas
 
-**➡️ Main writeup: [`WRITEUP.md`](WRITEUP.md)** — *Does the SAE-absorption metric over-report for
+**📄 Technical report: [`paper/paper.pdf`](paper/paper.pdf)** — the full 15-page write-up:
+a cross-metric, cross-model (Gemma-2-2B & 2-9B) metric-validity audit of SAE feature absorption.
+
+**➡️ Short version: [`WRITEUP.md`](WRITEUP.md)** — *Does the SAE-absorption metric over-report for
 non-spelling features?* (a metric-validity note; the honest headline result of this repo).
 
 **Does SAE feature absorption generalize beyond first-letter spelling?**
@@ -56,7 +59,8 @@ L0, *higher* — magnitude:
 
 Last-letter is still a *letter* property (close to first-letter); the stronger test of generality is
 the **binary** properties (is-capitalized / is-numeric / has-suffix), which need a separate single-class
-orchestration — that's next. See [`PLAN.md`](PLAN.md).
+orchestration — the `is-capitalized` study, including the cross-metric disagreement that became the
+headline result, is in the [final report](paper/paper.pdf).
 
 ## Method (from Chanin et al. + their reference code)
 
@@ -69,9 +73,9 @@ For a concept, three stages (all from the [`sae-spelling`](https://github.com/la
    carries the concept. `absorption_rate = #absorbed / #probe-true-positives`, per concept.
 
 Extending to a new property needs its own ICL formatter + logit-diff `metric_fn` + probe +
-k-sparse results; the calculator and aggregation are reused. Key gotchas (recalibrate the
+k-sparse results; the calculator and aggregation are reused. Key gotchas: recalibrate the
 IG-gap threshold per property; verify a clean "main" latent even exists via the k-sparse F1
-curve; layer ceiling ≤17 for Gemma-2-2b) are documented in `PLAN.md`.
+curve; layer ceiling ≤17 for Gemma-2-2b.
 
 ## Setup
 
