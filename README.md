@@ -104,5 +104,7 @@ Produces `results/gate/gate_summary.json` with the per-letter and mean absorptio
 
 ## License / credit
 
-Builds directly on the `sae-spelling` implementation by the LASR spelling team. This repo adds
-the multi-property extension + replication.
+MIT — see [`LICENSE`](LICENSE). Builds directly on the MIT-licensed
+[`sae-spelling`](https://github.com/lasr-spelling/sae-spelling) implementation by the LASR
+spelling team (cloned alongside, not vendored). This repo adds the multi-property extension +
+replication.
