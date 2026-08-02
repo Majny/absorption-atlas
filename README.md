@@ -108,3 +108,10 @@ MIT — see [`LICENSE`](LICENSE). Builds directly on the MIT-licensed
 [`sae-spelling`](https://github.com/lasr-spelling/sae-spelling) implementation by the LASR
 spelling team (cloned alongside, not vendored). This repo adds the multi-property extension +
 replication.
+
+## Author
+
+**Jakub Dvořák** — engineer & founder moving into AI-safety research (mechanistic
+interpretability, MFF UK Prague). Site: [kubadvorak.com](https://kubadvorak.com) ·
+Writing: [kubadvorak.substack.com](https://kubadvorak.substack.com) ·
+Contact: hi@kubadvorak.com
