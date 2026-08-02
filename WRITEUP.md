@@ -7,11 +7,11 @@ in the literature almost entirely on the *first-letter spelling* task. I run the
 metrics — the **projection** metric (the current SAEBench standard) and the older **ablation/behavioral**
 metric — on a structurally different property, **is-capitalized**. The two metrics *disagree*: the
 projection metric reports single-dominant-latent absorption modestly above its own random-direction null
-(0.12 vs 0.03, R=3), while the ablation metric reports **exactly zero** on **273/273** candidate tokens,
-on **both** Gemma-2-2b and Gemma-2-9b. Two controls rule out the boring explanations — it is **not** the
+(0.12 vs 0.03, R=3), while the ablation metric reports **exactly zero** on every candidate token —
+**0/727** on Gemma-2-2b and **0/273** on Gemma-2-9b. Two controls rule out the boring explanations — it is **not** the
 model failing the task (9b does is-capitalized at 0.91 accuracy, still 0.0) and **not** a dead layer (at
 the same 9b layer/L0, the ablation metric fires at 0.045 for spelling; at matched task accuracy ~0.9 it
-fires at ~0.026 for spelling but 0.0 for is-capitalized). So: **the field-standard projection metric
+fires at ~0.017–0.035 for spelling but 0.0 for is-capitalized). So: **the field-standard projection metric
 appears to over-report single-latent absorption for a distributed structural feature that has no causal
 correlate.** The effect is small and rests on one structural property; I state its limits plainly.
 
@@ -42,12 +42,12 @@ so structural properties are not virgin territory — but **running the absorpti
 
 ## The result: the two metrics disagree for is-capitalized
 
-**Projection (SAEBench standard), single-dominant-latent rate at R=3, bootstrap 95% CI over the
+**Projection (SAEBench standard), single-dominant-latent rate at R=3, Wilson 95% CI over the
 main-latent-silent candidate pool:**
 
 | property | projection | random-direction null |
 |---|---|---|
-| first-letter | **0.54** [0.51, 0.56] (n=2085) | 0.04 [0.03, 0.05] |
+| first-letter | **0.53** [0.51, 0.55] (n=2085) | 0.04 [0.03, 0.05] |
 | is-capitalized | **0.12** [0.077, 0.191] (n=130) | 0.03 [0.014, 0.081] |
 
 So projection reports above-null absorption for is-capitalized — but **marginally** (the CIs barely
@@ -62,13 +62,13 @@ candidate tokens absorbed (binomial 95% CI [0, ~0.011]). A robust zero.
 |---|---|---|
 | first-letter (2b, L12) | ~0.95 | 0.032 |
 | first-letter (9b, L20) | ~0.96 | **0.045** |
-| is-capitalized (2b, L12) | 0.60 | 0.0 |
+| is-capitalized (2b, L12) | 0.59 | 0.0 |
 | **is-capitalized (9b, L20)** | **0.91** | **0.0** |
 
 - **Not task-validity:** 9b performs is-capitalized at 0.91 (vs 2b 0.60), yet behavioral absorption stays 0.
 - **Not a dead layer:** at the same 9b layer/L0, spelling behavioral absorption is 0.045.
 - **Matched accuracy:** using an ICL-count + corrupted-ICL sweep on 2b first-letter, behavioral absorption
-  at accuracy ~0.9 is ~0.026 — so at *matched* task ability, spelling absorbs (~0.026) and is-capitalized
+  at accuracy ~0.9 is ~0.017–0.035 — so at *matched* task ability, spelling absorbs and is-capitalized
   does not (0.0). This is the airtight version of "not task-validity."
 
 **Side result (a real confound-caveat for the ablation metric):** *within* first-letter, behavioral
