@@ -40,7 +40,7 @@ Google's better-trained Gemma Scope SAEs:
 | 445 | 0.010 |
 
 Per-letter variance is wide with `s` (Chanin's worked-example letter, *short*) among the highest.
-Independently verified as a faithful reproduction — see
+Cross-checked against published SAEBench/Absorption results — see
 [`results/gate/VERIFICATION.md`](results/gate/VERIFICATION.md).
 
 **First generalization result: absorption is NOT specific to first-letter.** The same measurement on
