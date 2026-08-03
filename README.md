@@ -112,6 +112,6 @@ replication.
 ## Author
 
 **Jakub Dvořák** — engineer & founder moving into AI-safety research (mechanistic
-interpretability, MFF UK Prague). Site: [kubadvorak.com](https://kubadvorak.com) ·
+interpretability & superposition, MFF UK Prague). Site: [kubadvorak.com](https://kubadvorak.com) ·
 Writing: [kubadvorak.substack.com](https://kubadvorak.substack.com) ·
 Contact: hi@kubadvorak.com
