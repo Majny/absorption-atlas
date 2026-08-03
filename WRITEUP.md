@@ -7,13 +7,14 @@ in the literature almost entirely on the *first-letter spelling* task. I run the
 metrics — the **projection** metric (the current SAEBench standard) and the older **ablation/behavioral**
 metric — on a structurally different property, **is-capitalized**. The two metrics *disagree*: the
 projection metric reports single-dominant-latent absorption modestly above its own random-direction null
-(0.12 vs 0.03, R=3), while the ablation metric reports **exactly zero** on every candidate token —
-**0/727** on Gemma-2-2b and **0/273** on Gemma-2-9b. Two controls rule out the boring explanations — it is **not** the
-model failing the task (9b does is-capitalized at 0.91 accuracy, still 0.0) and **not** a dead layer (at
+(0.12 vs 0.03, R=3), while the ablation metric reports exactly zero on every candidate token:
+**0/727** on Gemma-2-2b and **0/273** on Gemma-2-9b. Two controls rule out the boring explanations: it is not the
+model failing the task (9b does is-capitalized at 0.91 accuracy, still 0.0), and not a dead layer (at
 the same 9b layer/L0, the ablation metric fires at 0.045 for spelling; at matched task accuracy ~0.9 it
-fires at ~0.017–0.035 for spelling but 0.0 for is-capitalized). So: **the field-standard projection metric
-appears to over-report single-latent absorption for a distributed structural feature that has no causal
-correlate.** The effect is small and rests on one structural property; I state its limits plainly.
+fires at ~0.017–0.035 for spelling but 0.0 for is-capitalized). So: the field-standard projection metric
+appears to **over-report** single-latent absorption for a distributed structural feature that has no
+causal correlate. The effect is small and rests on one structural property; its limits are spelled
+out below.
 
 ## Background
 
@@ -29,8 +30,8 @@ while a token-aligned latent ("short") carries the concept instead — *feature 
 
 Chanin's Future Work explicitly asks for "absorption unrelated to character identification." Feature
 Hedging (Chanin, [2505.11756](https://arxiv.org/abs/2505.11756)) already k-sparse-probes part-of-speech,
-so structural properties are not virgin territory — but **running the absorption metrics themselves
-(both) on structural properties, and contrasting them, has not been done.**
+so structural properties are not virgin territory. But running the absorption metrics themselves
+(both) on structural properties, and contrasting them, has not been done.
 
 ## What I did (and reproduced)
 
@@ -71,7 +72,7 @@ candidate tokens absorbed (binomial 95% CI [0, ~0.011]). A robust zero.
   at accuracy ~0.9 is ~0.017–0.035 — so at *matched* task ability, spelling absorbs and is-capitalized
   does not (0.0). This is the airtight version of "not task-validity."
 
-**Side result (a real confound-caveat for the ablation metric):** *within* first-letter, behavioral
+**Side result (a genuine confound for the ablation metric):** *within* first-letter, behavioral
 absorption tracks task accuracy — sweeping accuracy 0.53→0.97 (via ICL count and corrupted ICL) moves
 behavioral absorption 0.011→0.030, while the projection metric stays flat ~0.60. So the ablation metric
 is task-performance-sensitive; the projection metric is not.
@@ -83,11 +84,11 @@ metric's "single dominant latent" criterion reads modestly above chance, but the
 single-latent correlate**. The most likely mundane mechanism is **feature hedging** (Chanin 2505.11756):
 capitalization is a high-frequency, correlated concept that a 16k SAE spreads across several latents, so
 "one dominant latent by projection" is a weak, partly-geometric signal rather than a token-aligned
-absorber that the model actually *uses*. I do **not** claim a deep "representational-vs-causal
+absorber that the model actually *uses*. I do not claim a deep "representational-vs-causal
 dissociation"; I claim the narrower, checkable thing: the two metrics disagree here, projection over-reports
 relative to ablation, and the disagreement survives task-ability and layer controls.
 
-## Limitations (stated, not hidden)
+## Limitations
 
 - **Near-floor effects.** Spelling behavioral absorption is only ~0.01–0.05 anywhere; the projection
   is-capitalized signal (0.12) is marginal above its null. Small numbers.
@@ -101,7 +102,7 @@ relative to ablation, and the disagreement survives task-ability and layer contr
 ## What would make this a workshop paper (not done here)
 
 More structural properties at n>130; one non-Gemma or non-JumpReLU point; and one downstream demonstration.
-Given a Dec-2026 timeline, this note + the reproduction is an honest artifact as-is; the archival version
+Given a Dec-2026 timeline, this note + the reproduction is the artifact as-is; the archival version
 is future work.
 
 *Code + all figures/numbers: this repo. Every claim above is reproducible from the committed results.*
