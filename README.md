@@ -1,10 +1,10 @@
 # Absorption Atlas
 
-**📄 Technical report: [`paper/paper.pdf`](paper/paper.pdf)** — the full 15-page write-up:
+**Technical report: [`paper/paper.pdf`](paper/paper.pdf)** — the full 15-page write-up:
 a cross-metric, cross-model (Gemma-2-2B & 2-9B) metric-validity audit of SAE feature absorption.
 
-**➡️ Short version: [`WRITEUP.md`](WRITEUP.md)** — *Does the SAE-absorption metric over-report for
-non-spelling features?* (a metric-validity note; the honest headline result of this repo).
+**Short version: [`WRITEUP.md`](WRITEUP.md)** — *Does the SAE-absorption metric over-report for
+non-spelling features?* (a metric-validity note; the headline result of this repo).
 
 **Does SAE feature absorption generalize beyond first-letter spelling?**
 
