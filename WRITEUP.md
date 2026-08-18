@@ -7,8 +7,8 @@ in the literature almost entirely on the *first-letter spelling* task. I run the
 metrics — the **projection** metric (the current SAEBench standard) and the older **ablation/behavioral**
 metric — on a structurally different property, **is-capitalized**. The two metrics *disagree*: the
 projection metric reports single-dominant-latent absorption modestly above its own random-direction null
-(0.12 vs 0.03, R=3), while the ablation metric reports exactly zero on every candidate token:
-**0/727** on Gemma-2-2b and **0/273** on Gemma-2-9b. Two controls rule out the boring explanations: it is not the
+(0.12 vs 0.03, R=3), while the ablation metric finds zero absorbed tokens: **0 of 200 scored candidates**
+(from a 727-candidate pool) on Gemma-2-2b and **0/273** on Gemma-2-9b. Two controls rule out the boring explanations: it is not the
 model failing the task (9b does is-capitalized at 0.91 accuracy, still 0.0), and not a dead layer (at
 the same 9b layer/L0, the ablation metric fires at 0.045 for spelling; at matched task accuracy ~0.9 it
 fires at ~0.017–0.035 for spelling but 0.0 for is-capitalized). So: the field-standard projection metric
@@ -57,9 +57,12 @@ separate at n=130) and ~4× weaker than spelling.
 **Ablation (behavioral):** is-capitalized = **0.0** on Gemma-2-2b *and* Gemma-2-9b. On 9b, **0 of 273**
 candidate tokens absorbed (binomial 95% CI [0, ~0.011]). A robust zero.
 
-(The two metrics see different denominators by construction: the ablation calculator evaluates every
-candidate token from the absorption pipeline — 727 on 2b — while the projection rate is conditioned on
-the subset of candidates whose main latent is *fully silent*, n=130 on 2b.)
+(Coverage and denominators, stated precisely: on 2b both metrics run over the same 200-token sample of
+the 727-candidate pool. The ablation calculator first filters to prompts whose main latents are silent
+(308 of 727 qualify — an active main latent precludes absorption by definition) and IG-scores a random
+200 of those; the projection rate additionally conditions per token on *full* main-latent silence,
+leaving n=130. On 9b every candidate is accounted for: 238 of 273 have an active main latent and the
+remaining 35 were all scored.)
 
 ## Controls: it is not task-validity and not a dead layer
 

@@ -10,9 +10,9 @@ non-spelling features?* (a metric-validity note; the headline result of this rep
 
 On the structural property `is-capitalized`, the two standard absorption metrics **disagree**:
 the SAEBench-standard **projection** metric reports above-null single-latent absorption
-(**0.12** vs 0.03 random-direction null), while the older causal **ablation** metric reports an
-exact zero — **0/727** candidates on Gemma-2-2b and **0/273** on Gemma-2-9b — and cross-model +
-matched-accuracy controls rule out the boring explanations. The field-standard projection metric
+(**0.12** vs 0.03 random-direction null), while the older causal **ablation** metric finds zero
+absorbed tokens — **0 of 200 scored candidates** (727-candidate pool) on Gemma-2-2b and **0/273**
+on Gemma-2-9b — and cross-model + matched-accuracy controls rule out the boring explanations. The field-standard projection metric
 appears to over-report single-latent absorption for distributed structural features.
 
 ![cross-model comparison](paper/figures/crossmodel.png)
