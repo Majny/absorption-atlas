@@ -53,8 +53,8 @@ Gemma-2-9b (Gemma Scope $16$k SAEs), we find that they \emph{disagree}. The proj
 single-dominant-latent absorption whose point estimate is $3.6\times$ its random-direction null
 ($0.12$ vs.\ $0.03$ at the strict dominance ratio $R{=}3$, $n{=}130$; Wilson $95\%$ CI $[0.077,0.191]$,
 which excludes the null point estimate but is marginal at this sample size), whereas the ablation
-metric reports exactly zero absorption on \emph{every} candidate token on both models ($0/727$ on
-Gemma-2-2b, $0/273$ on Gemma-2-9b). Two controls rule out the mundane
+metric reports zero absorption on every candidate token it scores ($0/200$ sampled from the
+$727$-candidate pool on Gemma-2-2b, $0/273$ on Gemma-2-9b). Two controls rule out the mundane
 explanations: the zero is not caused by the model failing the task (Gemma-2-9b performs \iscap{} at
 $0.91$ accuracy, versus $0.59$ for 2b, yet ablation absorption stays $0.0$) and not by a dead layer
 (at the same 9b layer the ablation metric fires at $0.045$ for spelling, and at \emph{matched} task
@@ -131,9 +131,9 @@ artifact nor a dead-layer artifact.
   to our knowledge, the first \emph{direct contrast of the two absorption metrics} on such features
   (\S\ref{sec:related}).
   \item \textbf{A metric disagreement, with confidence intervals.} For \iscap{}, projection reports
-  above-null absorption while ablation reports zero on \emph{every} candidate token ($0/727$ on
-  Gemma-2-2b, $0/273$ on Gemma-2-9b); we report CIs and candidate counts throughout, because the effect
-  is near-floor (\S\ref{sec:proj},\,\ref{sec:abl}).
+  above-null absorption while ablation reports zero on every scored candidate ($0/200$ sampled from
+  $727$ candidates on Gemma-2-2b, $0/273$ on Gemma-2-9b); we report CIs and candidate counts throughout,
+  because the effect is near-floor (\S\ref{sec:proj},\,\ref{sec:abl}).
   \item \textbf{Controls that isolate the cause.} A cross-model task-ability control and a layer- and
   accuracy-matched spelling control together rule out both ``the model cannot do the task'' and ``the layer
   is dead'' (\S\ref{sec:controls}).
@@ -408,8 +408,8 @@ absorption.
 
 \subsection{The ablation metric reports a clean zero}\label{sec:abl}
 The ablation metric tells the opposite story. For \iscap{} it reports absorption of exactly $0.0$ on every
-candidate token---$0/727$ on Gemma-2-2b and $0/273$ on Gemma-2-9b (binomial $95\%$ CI $[0,0.011]$ for the
-9b pool). The probe and main latent are excellent in both cases (probe AUROC $\approx 1.00$, $k$-sparse
+scored candidate---$0/200$ sampled from the $727$-candidate pool on Gemma-2-2b (Table~\ref{tab:funnel})
+and $0/273$ on Gemma-2-9b (binomial $95\%$ CI $[0,0.011]$ for the 9b pool). The probe and main latent are excellent in both cases (probe AUROC $\approx 1.00$, $k$-sparse
 $F_1\approx 0.99$), so this is not a failure to find the concept---the concept is cleanly present and cleanly
 detectable; it simply is not carried causally by a single absorbing latent.
 
