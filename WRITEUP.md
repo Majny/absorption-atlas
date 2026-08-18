@@ -57,6 +57,10 @@ separate at n=130) and ~4× weaker than spelling.
 **Ablation (behavioral):** is-capitalized = **0.0** on Gemma-2-2b *and* Gemma-2-9b. On 9b, **0 of 273**
 candidate tokens absorbed (binomial 95% CI [0, ~0.011]). A robust zero.
 
+(The two metrics see different denominators by construction: the ablation calculator evaluates every
+candidate token from the absorption pipeline — 727 on 2b — while the projection rate is conditioned on
+the subset of candidates whose main latent is *fully silent*, n=130 on 2b.)
+
 ## Controls: it is not task-validity and not a dead layer
 
 | condition | task accuracy | behavioral absorption |
@@ -66,7 +70,7 @@ candidate tokens absorbed (binomial 95% CI [0, ~0.011]). A robust zero.
 | is-capitalized (2b, L12) | 0.59 | 0.0 |
 | **is-capitalized (9b, L20)** | **0.91** | **0.0** |
 
-- **Not task-validity:** 9b performs is-capitalized at 0.91 (vs 2b 0.60), yet behavioral absorption stays 0.
+- **Not task-validity:** 9b performs is-capitalized at 0.91 (vs 2b 0.59), yet behavioral absorption stays 0.
 - **Not a dead layer:** at the same 9b layer/L0, spelling behavioral absorption is 0.045.
 - **Matched accuracy:** using an ICL-count + corrupted-ICL sweep on 2b first-letter, behavioral absorption
   at accuracy ~0.9 is ~0.017–0.035 — so at *matched* task ability, spelling absorbs and is-capitalized
@@ -105,4 +109,9 @@ More structural properties at n>130; one non-Gemma or non-JumpReLU point; and on
 Given a Dec-2026 timeline, this note + the reproduction is the artifact as-is; the archival version
 is future work.
 
-*Code + all figures/numbers: this repo. Every claim above is reproducible from the committed results.*
+*Code + all figures/numbers: [github.com/Majny/absorption-atlas](https://github.com/Majny/absorption-atlas);
+full 15-page technical report with appendices: [paper/paper.pdf](https://github.com/Majny/absorption-atlas/blob/main/paper/paper.pdf).
+Every claim above is reproducible from the committed results.*
+
+*Engineering and drafting were AI-assisted (Claude); the research direction, experimental design,
+verification of every number, and the conclusions are mine.*

@@ -6,6 +6,17 @@ a cross-metric, cross-model (Gemma-2-2B & 2-9B) metric-validity audit of SAE fea
 **Short version: [`WRITEUP.md`](WRITEUP.md)** — *Does the SAE-absorption metric over-report for
 non-spelling features?* (a metric-validity note; the headline result of this repo).
 
+## Headline result
+
+On the structural property `is-capitalized`, the two standard absorption metrics **disagree**:
+the SAEBench-standard **projection** metric reports above-null single-latent absorption
+(**0.12** vs 0.03 random-direction null), while the older causal **ablation** metric reports an
+exact zero — **0/727** candidates on Gemma-2-2b and **0/273** on Gemma-2-9b — and cross-model +
+matched-accuracy controls rule out the boring explanations. The field-standard projection metric
+appears to over-report single-latent absorption for distributed structural features.
+
+![cross-model comparison](paper/figures/crossmodel.png)
+
 **Does SAE feature absorption generalize beyond first-letter spelling?**
 
 Sparse autoencoders (SAEs) are meant to decompose a language model's activations into
@@ -21,12 +32,12 @@ This project measures absorption across a battery of other objective, tokenizer-
 properties (last-letter, is-capitalized, ALL-CAPS, is-numeric, common suffixes) on off-the-shelf
 public SAEs (Gemma Scope), to answer that question.
 
-## Status
+## Reproduction: first-letter absorption (pipeline validation)
 
-**Week-1 gate: PASSED** (2026-07-18). Reproduced first-letter feature absorption on current Gemma
-Scope SAEs (Gemma-2-2b, layer 12, width 16k), 200 prompts/letter, on GPU. Rather than a single
-number, an **L0 sweep** reproduces the paper's central law — absorption rises steeply as L0 falls —
-and sits a consistent ~2.6–3.4× *below* SAEBench's own JumpReLU reference, exactly as expected for
+Reproduced first-letter feature absorption on current Gemma Scope SAEs (Gemma-2-2b, layer 12,
+width 16k), 200 prompts/letter, on GPU (2026-07-18). Rather than a single number, an **L0 sweep**
+reproduces the paper's central law — absorption rises steeply as L0 falls — and sits a consistent
+~2.6–3.4× *below* SAEBench's own JumpReLU reference, consistent with expectations for
 Google's better-trained Gemma Scope SAEs:
 
 ![absorption vs L0](results/gate/absorption_vs_l0.png)
@@ -57,10 +68,11 @@ L0, *higher* — magnitude:
 | 176 | 0.019 | 0.030 |
 | 445 | 0.010 | 0.017 |
 
-Last-letter is still a *letter* property (close to first-letter); the stronger test of generality is
-the **binary** properties (is-capitalized / is-numeric / has-suffix), which need a separate single-class
-orchestration — the `is-capitalized` study, including the cross-metric disagreement that became the
-headline result, is in the [final report](paper/paper.pdf).
+Last-letter is still a *letter* property (close to first-letter), so the two results reconcile:
+**letter-family properties generalize** (last-letter absorbs like first-letter), while **structural
+properties show no behavioral absorption at all** — and that split is exactly what exposes the
+projection metric (see the [headline result](#headline-result) above). The full `is-capitalized`
+study is in the [final report](paper/paper.pdf).
 
 ## Method (from Chanin et al. + their reference code)
 
@@ -115,3 +127,6 @@ replication.
 interpretability & superposition, MFF UK Prague). Site: [kubadvorak.com](https://kubadvorak.com) ·
 Writing: [kubadvorak.substack.com](https://kubadvorak.substack.com) ·
 Contact: hi@kubadvorak.com
+
+Engineering and drafting were AI-assisted (Claude); the research direction, experimental design,
+verification of every number, and the conclusions are the author's.
