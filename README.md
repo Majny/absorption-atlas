@@ -1,19 +1,25 @@
 # Absorption Atlas
 
-**Technical report: [`paper/paper.pdf`](paper/paper.pdf)** — the full 15-page write-up:
-a cross-metric, cross-model (Gemma-2-2B & 2-9B) metric-validity audit of SAE feature absorption.
+**How a concept is carried inside a network depends on what kind of concept it is.** With Gemma Scope
+sparse autoencoders on Gemma-2-2B and 2-9B, letter-like properties are absorbed into token-specific
+latents (first letter on both models, last letter on 2B), while the structural property
+`is-capitalized` is carried with no single latent causally responsible for it.
 
-**Short version: [`WRITEUP.md`](WRITEUP.md)** — *Does the SAE-absorption metric over-report for
-non-spelling features?* (a metric-validity note; the headline result of this repo).
+**Technical report** ([`paper/paper.pdf`](paper/paper.pdf)): the full 15-page write-up, a cross-metric,
+cross-model study of feature absorption beyond first-letter spelling.
+
+**Short version** ([`WRITEUP.md`](WRITEUP.md)): *Does the SAE-absorption metric over-report for
+non-spelling features?*
 
 ## Headline result
 
-On the structural property `is-capitalized`, the two standard absorption metrics **disagree**:
-the SAEBench-standard **projection** metric reports above-null single-latent absorption
-(**0.12** vs 0.03 random-direction null), while the older causal **ablation** metric finds zero
-absorbed tokens — **0 of 200 scored candidates** (727-candidate pool) on Gemma-2-2b and **0/273**
-on Gemma-2-9b — and cross-model + matched-accuracy controls rule out the boring explanations. The field-standard projection metric
-appears to over-report single-latent absorption for distributed structural features.
+On `is-capitalized`, the causal **ablation** metric finds zero absorbed tokens: **0 of 200 scored
+candidates** (727-candidate pool) on Gemma-2-2b and **0/273** on Gemma-2-9b. Cross-model and
+matched-accuracy controls make task failure or a dead layer unlikely explanations. The
+SAEBench-standard **projection** metric still reports single-latent absorption marginally above its
+random-direction null (**0.12** vs 0.03 at n=130, with slightly overlapping Wilson intervals), so for a
+distributed structural feature the two standard metrics disagree and the projection metric appears to
+over-report.
 
 ![cross-model comparison](paper/figures/crossmodel.png)
 
@@ -22,21 +28,21 @@ appears to over-report single-latent absorption for distributed structural featu
 Sparse autoencoders (SAEs) are meant to decompose a language model's activations into
 reliable, monosemantic features. **Feature absorption** (Chanin et al.,
 [2409.14507](https://arxiv.org/abs/2409.14507)) is a known failure mode: a specific latent
-"absorbs" the direction of a more general one, so the general latent silently fails to fire —
-e.g. a *starts-with-L* latent stays dark on *lion* because a dedicated *lion* latent swallowed
+"absorbs" the direction of a more general one, so the general latent silently fails to fire.
+For example, a *starts-with-L* latent stays dark on *lion* because a dedicated *lion* latent swallowed
 the direction. This undermines the SAE-as-decomposition premise.
 
 Today absorption is measured on essentially **one task**: "token starts with letter X". Whether
 absorption is a **general** SAE failure mode or a **quirk of alphabetical spelling** is open.
 This project measures absorption across a battery of other objective, tokenizer-derivable token
-properties (last-letter, is-capitalized, ALL-CAPS, is-numeric, common suffixes) on off-the-shelf
+properties (last-letter, is-capitalized, ALL-CAPS, common suffixes) on off-the-shelf
 public SAEs (Gemma Scope), to answer that question.
 
 ## Reproduction: first-letter absorption (pipeline validation)
 
 Reproduced first-letter feature absorption on current Gemma Scope SAEs (Gemma-2-2b, layer 12,
 width 16k), 200 prompts/letter, on GPU (2026-07-18). Rather than a single number, an **L0 sweep**
-reproduces the paper's central law — absorption rises steeply as L0 falls — and sits a consistent
+reproduces the paper's central law (absorption rises steeply as L0 falls) and sits a consistent
 ~2.6–3.4× *below* SAEBench's own JumpReLU reference, consistent with expectations for
 Google's better-trained Gemma Scope SAEs:
 
@@ -51,12 +57,12 @@ Google's better-trained Gemma Scope SAEs:
 | 445 | 0.010 |
 
 Per-letter variance is wide with `s` (Chanin's worked-example letter, *short*) among the highest.
-Cross-checked against published SAEBench/Absorption results — see
+Cross-checked against published SAEBench/Absorption results; see
 [`results/gate/VERIFICATION.md`](results/gate/VERIFICATION.md).
 
 **First generalization result: absorption is NOT specific to first-letter.** The same measurement on
-**last-letter** (Gemma-2-2b, layer 12, 16k) gives a curve of the same shape and comparable — at mid/high
-L0, *higher* — magnitude:
+**last-letter** (Gemma-2-2b, layer 12, 16k) gives a curve of the same shape and comparable (at mid/high
+L0, *higher*) magnitude:
 
 ![absorption by property](results/absorption_property_comparison.png)
 
@@ -70,8 +76,8 @@ L0, *higher* — magnitude:
 
 Last-letter is still a *letter* property (close to first-letter), so the two results reconcile:
 **letter-family properties generalize** (last-letter absorbs like first-letter), while **structural
-properties show no behavioral absorption at all** — and that split is exactly what exposes the
-projection metric (see the [headline result](#headline-result) above). The full `is-capitalized`
+properties show no behavioral absorption at all**, and that split is where the projection metric
+parts ways with the causal one (see the [headline result](#headline-result) above). The full `is-capitalized`
 study is in the [final report](paper/paper.pdf).
 
 ## Method (from Chanin et al. + their reference code)
@@ -110,21 +116,21 @@ Produces `results/gate/gate_summary.json` with the per-letter and mean absorptio
 
 ## Prior art
 
-- Chanin et al., *A is for Absorption* ([2409.14507](https://arxiv.org/abs/2409.14507)) — defines
-  + measures absorption, first-letter only.
-- SAEBench ([2503.09532](https://arxiv.org/abs/2503.09532)) — standardizes the metric, first-letter only.
+- Chanin et al., *A is for Absorption* ([2409.14507](https://arxiv.org/abs/2409.14507)): defines
+  and measures absorption, first-letter only.
+- SAEBench ([2503.09532](https://arxiv.org/abs/2503.09532)): standardizes the metric, first-letter only.
 
 ## License / credit
 
-MIT — see [`LICENSE`](LICENSE). Builds directly on the MIT-licensed
+MIT, see [`LICENSE`](LICENSE). Builds directly on the MIT-licensed
 [`sae-spelling`](https://github.com/lasr-spelling/sae-spelling) implementation by the LASR
 spelling team (cloned alongside, not vendored). This repo adds the multi-property extension +
 replication.
 
 ## Author
 
-**Jakub Dvořák** — engineer & founder moving into AI-safety research (mechanistic
-interpretability & superposition, MFF UK Prague). Site: [kubadvorak.com](https://kubadvorak.com) ·
+**Jakub Dvořák**: AI and backend engineer in Prague, trained in systems programming (MFF UK);
+interpretability research is a serious hobby. Site: [kubadvorak.com](https://kubadvorak.com) ·
 Writing: [kubadvorak.substack.com](https://kubadvorak.substack.com) ·
 Contact: hi@kubadvorak.com
 

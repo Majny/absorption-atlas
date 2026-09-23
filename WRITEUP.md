@@ -1,11 +1,11 @@
 # Does the SAE-absorption metric over-report for non-spelling features?
 
-*A metric-validity note. Jakub Dvořák, 2026-07. Gemma-2-2b/9b, Gemma Scope SAEs.*
+*A short research note. Jakub Dvořák, 2026-07. Gemma-2-2b/9b, Gemma Scope SAEs.*
 
 **TL;DR (the one claim, stated up front).** SAE "feature absorption" (Chanin et al., 2024) is measured
 in the literature almost entirely on the *first-letter spelling* task. I run the two standard absorption
-metrics — the **projection** metric (the current SAEBench standard) and the older **ablation/behavioral**
-metric — on a structurally different property, **is-capitalized**. The two metrics *disagree*: the
+metrics, the **projection** metric (the current SAEBench standard) and the older **ablation/behavioral**
+metric, on a structurally different property, **is-capitalized**. The two metrics *disagree*: the
 projection metric reports single-dominant-latent absorption modestly above its own random-direction null
 (0.12 vs 0.03, R=3), while the ablation metric finds zero absorbed tokens: **0 of 200 scored candidates**
 (from a 727-candidate pool) on Gemma-2-2b and **0/273** on Gemma-2-9b. Two controls rule out the boring explanations: it is not the
@@ -13,13 +13,13 @@ model failing the task (9b does is-capitalized at 0.91 accuracy, still 0.0), and
 the same 9b layer/L0, the ablation metric fires at 0.045 for spelling; at matched task accuracy ~0.9 it
 fires at ~0.017–0.035 for spelling but 0.0 for is-capitalized). So: the field-standard projection metric
 appears to **over-report** single-latent absorption for a distributed structural feature that has no
-causal correlate. The effect is small and rests on one structural property; its limits are spelled
+single-latent causal correlate. The effect is small and rests on one structural property; its limits are spelled
 out below.
 
 ## Background
 
 An SAE latent that looks monosemantic for a concept ("starts-with-S") can silently fail on some tokens
-while a token-aligned latent ("short") carries the concept instead — *feature absorption* (Chanin et al.,
+while a token-aligned latent ("short") carries the concept instead: *feature absorption* (Chanin et al.,
 [2409.14507](https://arxiv.org/abs/2409.14507)). Two metrics quantify it:
 - **ablation / behavioral:** integrated-gradient attribution of SAE latents to the model's *task answer*
   (e.g. the first-letter logit). Chanin's original; known to **decay to ~0 in later layers**, which is
@@ -51,15 +51,15 @@ main-latent-silent candidate pool:**
 | first-letter | **0.53** [0.51, 0.55] (n=2085) | 0.04 [0.03, 0.05] |
 | is-capitalized | **0.12** [0.077, 0.191] (n=130) | 0.03 [0.014, 0.081] |
 
-So projection reports above-null absorption for is-capitalized — but **marginally** (the CIs barely
-separate at n=130) and ~4× weaker than spelling.
+So projection reports absorption for is-capitalized above the null's point estimate, but only **marginally** (the Wilson
+intervals overlap slightly at n=130: [0.077, 0.191] vs [0.014, 0.081]) and ~4× weaker than spelling.
 
 **Ablation (behavioral):** is-capitalized = **0.0** on Gemma-2-2b *and* Gemma-2-9b. On 9b, **0 of 273**
 candidate tokens absorbed (binomial 95% CI [0, ~0.011]). A robust zero.
 
 (Coverage and denominators, stated precisely: on 2b both metrics run over the same 200-token sample of
 the 727-candidate pool. The ablation calculator first filters to prompts whose main latents are silent
-(308 of 727 qualify — an active main latent precludes absorption by definition) and IG-scores a random
+(308 of 727 qualify; an active main latent precludes absorption by definition) and IG-scores a random
 200 of those; the projection rate additionally conditions per token on *full* main-latent silence,
 leaving n=130. On 9b every candidate is accounted for: 238 of 273 have an active main latent and the
 remaining 35 were all scored.)
@@ -76,11 +76,11 @@ remaining 35 were all scored.)
 - **Not task-validity:** 9b performs is-capitalized at 0.91 (vs 2b 0.59), yet behavioral absorption stays 0.
 - **Not a dead layer:** at the same 9b layer/L0, spelling behavioral absorption is 0.045.
 - **Matched accuracy:** using an ICL-count + corrupted-ICL sweep on 2b first-letter, behavioral absorption
-  at accuracy ~0.9 is ~0.017–0.035 — so at *matched* task ability, spelling absorbs and is-capitalized
+  at accuracy ~0.9 is ~0.017–0.035, so at *matched* task ability, spelling absorbs and is-capitalized
   does not (0.0). This is the airtight version of "not task-validity."
 
 **Side result (a genuine confound for the ablation metric):** *within* first-letter, behavioral
-absorption tracks task accuracy — sweeping accuracy 0.53→0.97 (via ICL count and corrupted ICL) moves
+absorption tracks task accuracy: sweeping accuracy 0.53→0.97 (via ICL count and corrupted ICL) moves
 behavioral absorption 0.011→0.030, while the projection metric stays flat ~0.60. So the ablation metric
 is task-performance-sensitive; the projection metric is not.
 
