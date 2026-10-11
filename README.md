@@ -130,7 +130,7 @@ replication.
 ## Author
 
 **Jakub Dvořák**: AI and backend engineer in Prague, trained in systems programming (MFF UK);
-interpretability research is a serious hobby. Site: [kubadvorak.com](https://kubadvorak.com) ·
+alongside engineering I do independent interpretability research. Site: [kubadvorak.com](https://kubadvorak.com) ·
 Writing: [kubadvorak.substack.com](https://kubadvorak.substack.com) ·
 Contact: hi@kubadvorak.com
 
