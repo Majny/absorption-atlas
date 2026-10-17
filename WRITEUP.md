@@ -7,12 +7,13 @@ in the literature almost entirely on the *first-letter spelling* task. I run the
 metrics, the **projection** metric (the current SAEBench standard) and the older **ablation/behavioral**
 metric, on a structurally different property, **is-capitalized**. The two metrics *disagree*: the
 projection metric reports single-dominant-latent absorption modestly above its own random-direction null
-(0.12 vs 0.03, R=3), while the ablation metric finds zero absorbed tokens: **0 of 200 scored candidates**
-(from a 727-candidate pool) on Gemma-2-2b and **0/273** on Gemma-2-9b. Two controls rule out the boring explanations: it is not the
-model failing the task (9b does is-capitalized at 0.91 accuracy, still 0.0), and not a dead layer (at
-the same 9b layer/L0, the ablation metric fires at 0.045 for spelling; at matched task accuracy ~0.9 it
-fires at ~0.017–0.035 for spelling but 0.0 for is-capitalized). So: the field-standard projection metric
-appears to **over-report** single-latent absorption for a distributed structural feature that has no
+(0.12 vs 0.03, R=3), while the ablation metric finds almost no absorbed tokens: **1 of 198** scored
+main-silent candidates on Gemma-2-2b and **1 of 35** on Gemma-2-9b, at the same 3× dominance ratio (versus
+0.41 and 0.43 for spelling). Two controls make the boring explanations unlikely: it is not the
+model failing the task (9b does is-capitalized at 0.91 accuracy, still 1/35), and not a dead layer (at
+the same 9b layer/L0, the ablation metric fires at 0.045 for spelling). Per probe true positive under the
+same 3× ratio, spelling scores 0.038 (2b) and 0.049 (9b) against ~0.0001 for is-capitalized. So: the field-standard projection metric
+appears to **over-report** single-latent absorption for a distributed structural feature that has almost no
 single-latent causal correlate. The effect is small and rests on one structural property; its limits are spelled
 out below.
 
@@ -31,15 +32,15 @@ while a token-aligned latent ("short") carries the concept instead: *feature abs
 Chanin's Future Work explicitly asks for "absorption unrelated to character identification." Feature
 Hedging (Chanin, [2505.11756](https://arxiv.org/abs/2505.11756)) already k-sparse-probes part-of-speech,
 so structural properties are not virgin territory. But running the absorption metrics themselves
-(both) on structural properties, and contrasting them, has not been done.
+(both) on structural properties, and contrasting them, has not been done to my knowledge.
 
 ## What I did (and reproduced)
 
 - Reproduced first-letter absorption on current Gemma Scope SAEs (Gemma-2-2b, L12/16k): mean rate 0.032,
   and the **L0 law** (absorption rises as L0 falls: L0 22→0.127 … 445→0.010), independently consistent
   with SAEBench. (Reproduction, not new.)
-- Extended to structural properties (is-capitalized, all-caps, suffix -ing/-ed). is-capitalized (n≈130–273
-  candidates) is the only well-powered anchor; all-caps/suffix (n=9–33) are underpowered anecdotes.
+- Extended to structural properties (is-capitalized, all-caps, suffix -ing/-ed). is-capitalized (727 candidates
+  on 2b, 273 on 9b; 130–198 scored per metric on 2b, 35 on 9b) is the only well-powered anchor; all-caps/suffix (n=9–33) are underpowered anecdotes.
 
 ## The result: the two metrics disagree for is-capitalized
 
@@ -54,40 +55,55 @@ main-latent-silent candidate pool:**
 So projection reports absorption for is-capitalized above the null's point estimate, but only **marginally** (the Wilson
 intervals overlap slightly at n=130: [0.077, 0.191] vs [0.014, 0.081]) and ~4× weaker than spelling.
 
-**Ablation (behavioral):** is-capitalized = **0.0** on Gemma-2-2b *and* Gemma-2-9b. On 9b, **0 of 273**
-candidate tokens absorbed (binomial 95% CI [0, ~0.011]). A robust zero.
+**Ablation (behavioral):** Chanin's criterion requires the top attribution to beat the runner-up by an
+*absolute* IG gap (≥1.0, calibrated to the 26-way letter logit). On the binary True/False logit the largest
+gap among scored is-capitalized tokens is 0.050 (2b) and 0.146 (9b), below every threshold tested
+(0.5–4.0), so its 0.0 is forced by scale. With a scale-free ratio instead (main latent silent, top
+attribution negative and probe-aligned, |top| ≥ R·|second|), conditioned on main-silent scored tokens:
+
+| ablation, conditioned | R=1.5 | R=2 | R=3 |
+|---|---|---|---|
+| first-letter, 2b (n=2283) | 0.64 [0.62, 0.66] | 0.54 [0.52, 0.56] | 0.41 [0.39, 0.43] |
+| is-capitalized, 2b (n=198) | 0.056 [0.031, 0.097] | 0.010 [0.003, 0.036] | 0.005 [0.001, 0.028] |
+| first-letter, 9b (n=2901) | 0.66 [0.65, 0.68] | 0.58 [0.56, 0.59] | 0.43 [0.41, 0.45] |
+| is-capitalized, 9b (n=35) | 0.17 [0.08, 0.33] | 0.086 [0.03, 0.22] | 0.029 [0.005, 0.145] |
+
+So on spelling the two metrics roughly agree (ablation 0.41 vs projection 0.53 at R=3), while on
+is-capitalized ablation is near zero (1/198 on 2b, 1/35 on 9b at R=3).
 
 (Coverage and denominators, stated precisely: on 2b both metrics run over the same 200-token sample of
 the 727-candidate pool. The ablation calculator first filters to prompts whose main latents are silent
 (308 of 727 qualify; an active main latent precludes absorption by definition) and IG-scores a random
 200 of those; the projection rate additionally conditions per token on *full* main-latent silence,
-leaving n=130. On 9b every candidate is accounted for: 238 of 273 have an active main latent and the
-remaining 35 were all scored.)
+leaving n=130, so the two conditioned pools overlap but are not identical tokens. On 9b every candidate
+is accounted for: 238 of 273 have an active main latent and the remaining 35 were all scored.)
 
 ## Controls: it is not task-validity and not a dead layer
 
-| condition | task accuracy | behavioral absorption |
-|---|---|---|
-| first-letter (2b, L12) | ~0.95 | 0.032 |
-| first-letter (9b, L20) | ~0.96 | **0.045** |
-| is-capitalized (2b, L12) | 0.59 | 0.0 |
-| **is-capitalized (9b, L20)** | **0.91** | **0.0** |
+| condition | task accuracy | behavioral absorption (per probe TP, absolute gap) | conditioned, R=3 |
+|---|---|---|---|
+| first-letter (2b, L12) | ~0.95 | 0.032 | 0.41 |
+| first-letter (9b, L20) | ~0.96 | **0.045** | 0.43 |
+| is-capitalized (2b, L12) | 0.59 | 0.0 (forced by scale) | 0.005 (1/198) |
+| **is-capitalized (9b, L20)** | **0.91** | **0.0** (forced by scale) | **0.029 (1/35)** |
 
-- **Not task-validity:** 9b performs is-capitalized at 0.91 (vs 2b 0.59), yet behavioral absorption stays 0.
-- **Not a dead layer:** at the same 9b layer/L0, spelling behavioral absorption is 0.045.
+- **Not task-validity:** 9b performs is-capitalized at 0.91 (vs 2b 0.59), yet behavioral absorption stays near zero (1/35).
+- **Not a dead layer:** at the same 9b layer/L0, spelling behavioral absorption is 0.045 (0.43 conditioned).
 - **Matched accuracy:** using an ICL-count + corrupted-ICL sweep on 2b first-letter, behavioral absorption
-  at accuracy ~0.9 is ~0.017–0.035, so at *matched* task ability, spelling absorbs and is-capitalized
-  does not (0.0). This is the airtight version of "not task-validity."
+  at accuracy ~0.9 is ~0.017–0.035 per probe true positive under the absolute gap, so spelling still
+  absorbs at the task ability 9b has on is-capitalized. The absolute gap cannot score is-capitalized; under
+  the R=3 ratio it is ~0.0001 per probe true positive, against 0.038 (2b) and 0.049 (9b) for spelling under
+  the same ratio (the sweep itself was not rescored at R=3).
 
 **Side result (a genuine confound for the ablation metric):** *within* first-letter, behavioral
 absorption tracks task accuracy: sweeping accuracy 0.53→0.97 (via ICL count and corrupted ICL) moves
-behavioral absorption 0.011→0.030, while the projection metric stays flat ~0.60. So the ablation metric
+behavioral absorption 0.011→0.030, while the projection metric (at R=2 here) stays roughly flat at 0.55–0.62. So the ablation metric
 is task-performance-sensitive; the projection metric is not.
 
 ## What it means, and the alternative I can't fully rule out
 
 The defensible reading is a **metric-validity** one: for a distributed structural feature, the projection
-metric's "single dominant latent" criterion reads modestly above chance, but there is **no causal
+metric's "single dominant latent" criterion reads modestly above chance, but there is **almost no causal
 single-latent correlate**. The most likely mundane mechanism is **feature hedging** (Chanin 2505.11756):
 capitalization is a high-frequency, correlated concept that a 16k SAE spreads across several latents, so
 "one dominant latent by projection" is a weak, partly-geometric signal rather than a token-aligned
@@ -97,7 +113,10 @@ relative to ablation, and the disagreement survives task-ability and layer contr
 
 ## Limitations
 
-- **Near-floor effects.** Spelling behavioral absorption is only ~0.01–0.05 anywhere; the projection
+- **Ablation threshold scale.** Chanin's absolute IG-gap threshold cannot fire on the binary logit, so
+  the is-capitalized ablation numbers rest on the scale-free ratio R, a substitute introduced for this reason (`analyze_scalefree.py`).
+  The 9b ablation pool is small (n=35, R=3 CI up to 0.145).
+- **Near-floor effects.** Spelling behavioral absorption is only ~0.01–0.05 of probe true positives anywhere; the projection
   is-capitalized signal (0.12) is marginal above its null. Small numbers.
 - **One structural property.** is-capitalized is the only well-powered one; all-caps/suffix are n=9–33.
   "Property-type-dependent" is really n=1 until more properties are powered up.
@@ -114,7 +133,9 @@ is future work.
 
 *Code + all figures/numbers: [github.com/Majny/absorption-atlas](https://github.com/Majny/absorption-atlas);
 full 15-page technical report with appendices: [paper/paper.pdf](https://github.com/Majny/absorption-atlas/blob/main/paper/paper.pdf).
-Every claim above is reproducible from the committed results.*
+The committed results cover most numbers above. Not yet committed: the ablation detail parquets for
+first-letter (`results/gate/`, `results/first_letter_9b/`) and 9b is-capitalized
+(`results/is_capitalized_9b/`), and the raw task-accuracy outputs (the accuracies are in the paper's tables).*
 
 *Engineering and drafting were AI-assisted (Claude); the research direction, experimental design,
 verification of every number, and the conclusions are mine.*
