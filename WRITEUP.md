@@ -127,7 +127,7 @@ relative to ablation, and the disagreement survives task-ability and layer contr
 More structural properties at n>130; one non-Gemma or non-JumpReLU point; and one downstream demonstration.
 
 *Code + all figures/numbers: [github.com/Majny/absorption-atlas](https://github.com/Majny/absorption-atlas);
-full 15-page technical report with appendices: [paper/paper.pdf](https://github.com/Majny/absorption-atlas/blob/main/paper/paper.pdf).
+full 16-page technical report with appendices: [paper/paper.pdf](https://github.com/Majny/absorption-atlas/blob/main/paper/paper.pdf).
 The committed results cover most numbers above. The ablation detail parquets for first-letter
 (`results/gate/`, `results/first_letter_9b/`) and 9b is-capitalized (`results/is_capitalized_9b/`) are not
 committed; their counts, with each parquet's sha256, are in

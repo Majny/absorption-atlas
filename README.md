@@ -5,7 +5,7 @@ sparse autoencoders on Gemma-2-2B and 2-9B, letter-like properties are absorbed 
 latents (first letter on both models, last letter on 2B), while the structural property
 `is-capitalized` is almost never carried by a single causally responsible latent.
 
-**Technical report** ([`paper/paper.pdf`](paper/paper.pdf)): the full 15-page write-up, a cross-metric,
+**Technical report** ([`paper/paper.pdf`](paper/paper.pdf)): the full 16-page write-up, a cross-metric,
 cross-model study of feature absorption beyond first-letter spelling.
 
 **Short version** ([`WRITEUP.md`](WRITEUP.md)): *Does the SAE-absorption metric over-report for
