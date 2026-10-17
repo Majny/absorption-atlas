@@ -128,9 +128,11 @@ More structural properties at n>130; one non-Gemma or non-JumpReLU point; and on
 
 *Code + all figures/numbers: [github.com/Majny/absorption-atlas](https://github.com/Majny/absorption-atlas);
 full 15-page technical report with appendices: [paper/paper.pdf](https://github.com/Majny/absorption-atlas/blob/main/paper/paper.pdf).
-The committed results cover most numbers above. Not yet committed: the ablation detail parquets for
-first-letter (`results/gate/`, `results/first_letter_9b/`) and 9b is-capitalized
-(`results/is_capitalized_9b/`), and the raw task-accuracy outputs (the accuracies are in the paper's tables).*
+The committed results cover most numbers above. The ablation detail parquets for first-letter
+(`results/gate/`, `results/first_letter_9b/`) and 9b is-capitalized (`results/is_capitalized_9b/`) are not
+committed; their counts, with each parquet's sha256, are in
+[`results/absorption_counts.json`](results/absorption_counts.json) (written by `count_absorption.py`).
+The raw task-accuracy outputs are not committed either (the accuracies are in the paper's tables).*
 
 *Engineering and drafting were AI-assisted (Claude); the research direction, experimental design,
 verification of every number, and the conclusions are mine.*
