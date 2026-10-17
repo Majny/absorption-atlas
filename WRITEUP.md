@@ -89,11 +89,6 @@ is accounted for: 238 of 273 have an active main latent and the remaining 35 wer
 
 - **Not task-validity:** 9b performs is-capitalized at 0.91 (vs 2b 0.59), yet behavioral absorption stays near zero (1/35).
 - **Not a dead layer:** at the same 9b layer/L0, spelling behavioral absorption is 0.045 (0.43 conditioned).
-- **Matched accuracy:** using an ICL-count + corrupted-ICL sweep on 2b first-letter, behavioral absorption
-  at accuracy ~0.9 is ~0.017–0.035 per probe true positive under the absolute gap, so spelling still
-  absorbs at the task ability 9b has on is-capitalized. The absolute gap cannot score is-capitalized; under
-  the R=3 ratio it is ~0.0001 per probe true positive, against 0.038 (2b) and 0.049 (9b) for spelling under
-  the same ratio (the sweep itself was not rescored at R=3).
 
 **Side result (a genuine confound for the ablation metric):** *within* first-letter, behavioral
 absorption tracks task accuracy: sweeping accuracy 0.53→0.97 (via ICL count and corrupted ICL) moves

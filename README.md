@@ -19,8 +19,8 @@ and **1 of 35** on Gemma-2-9b (0.029, [0.005, 0.145]; the other 238 of 273 candi
 latent), counting a token when one probe-aligned latent's attribution is at least 3× the runner-up's.
 Under the same criterion first-letter gives 0.41 (2b) and 0.43 (9b). Chanin's original absolute IG-gap
 threshold reports 0/200 and 0/35, but on the binary True/False logit the largest gap is 0.05 (2b) and
-0.15 (9b), below the lowest threshold tested (0.5), so that zero is forced by scale. Cross-model and
-matched-accuracy controls make task failure or a dead layer unlikely explanations. The
+0.15 (9b), below the lowest threshold tested (0.5), so that zero is forced by scale. Cross-model
+controls make task failure or a dead layer unlikely explanations. The
 SAEBench-standard **projection** metric still reports single-latent absorption marginally above its
 random-direction null (**0.12** vs 0.03 at n=130, with slightly overlapping Wilson intervals), so for a
 distributed structural feature the two standard metrics disagree and the projection metric appears to
