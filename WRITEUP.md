@@ -119,6 +119,8 @@ relative to ablation, and the disagreement survives task-ability and layer contr
   JumpReLU SAEs. No Matryoshka/TopK, no non-Gemma model.
 - **No downstream "so what."** I don't show a use-case that trusting the projection-flagged absorption
   would break.
+- **SAE loading.** SAEs were loaded with sae-lens<4, whose `fold_W_dec_norm` leaves JumpReLU thresholds
+  unscaled; all six Gemma Scope SAEs used have unit-norm decoder rows, so this is a no-op here.
 
 ## What would make this a workshop paper (not done here)
 
