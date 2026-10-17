@@ -1,6 +1,6 @@
 # Does the SAE-absorption metric over-report for non-spelling features?
 
-*A short research note. Jakub Dvořák, 2026-07. Gemma-2-2b/9b, Gemma Scope SAEs.*
+*A short research note. Jakub Dvořák. Gemma-2-2b/9b, Gemma Scope SAEs.*
 
 **TL;DR (the one claim, stated up front).** SAE "feature absorption" (Chanin et al., 2024) is measured
 in the literature almost entirely on the *first-letter spelling* task. I run the two standard absorption
@@ -123,8 +123,6 @@ relative to ablation, and the disagreement survives task-ability and layer contr
 ## What would make this a workshop paper (not done here)
 
 More structural properties at n>130; one non-Gemma or non-JumpReLU point; and one downstream demonstration.
-Given a Dec-2026 timeline, this note + the reproduction is the artifact as-is; the archival version
-is future work.
 
 *Code + all figures/numbers: [github.com/Majny/absorption-atlas](https://github.com/Majny/absorption-atlas);
 full 15-page technical report with appendices: [paper/paper.pdf](https://github.com/Majny/absorption-atlas/blob/main/paper/paper.pdf).
