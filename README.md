@@ -26,10 +26,12 @@ random-direction null (**0.12** vs 0.03 at n=130, with slightly overlapping Wils
 distributed structural feature the two standard metrics disagree and the projection metric appears to
 over-report.
 
-![cross-model comparison](paper/figures/crossmodel.png)
+![projection metric: concept direction vs random-direction baseline](paper/figures/probedir.png)
 
-*The figure plots the absolute-gap ablation rate per probe true positive; its `is-capitalized` zeros are
-the scale-forced zeros described above, not the 1/198 and 1/35 counts.*
+*Projection (SAEBench-standard) metric only: single-dominant-latent rate at R=3 on main-silent tokens,
+Gemma-2-2b layer 12, 16k, for the probe's concept direction versus a random direction (sparsity
+baseline). First-letter 0.53 (n=2085), last-letter 0.45 (n=2308), is-capitalized 0.12 (n=130); the
+suffix and all-caps pools (n=9–16) are underpowered. The ablation counts above are not in this figure.*
 
 **Does SAE feature absorption generalize beyond first-letter spelling?**
 
