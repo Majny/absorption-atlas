@@ -53,8 +53,8 @@ public SAEs (Gemma Scope), to answer that question.
 Reproduced first-letter feature absorption on current Gemma Scope SAEs (Gemma-2-2b, layer 12,
 width 16k), 200 prompts/letter, on GPU (2026-07-18). Rather than a single number, an **L0 sweep**
 reproduces the paper's central law (absorption rises steeply as L0 falls) and sits a consistent
-~2.6–3.4× *below* SAEBench's own JumpReLU reference, consistent with expectations for
-Google's better-trained Gemma Scope SAEs:
+~2.6–3.4× *below* SAEBench's own JumpReLU reference; we suspect this reflects Google's
+better-trained Gemma Scope SAEs:
 
 ![absorption vs L0](results/gate/absorption_vs_l0.png)
 
@@ -103,7 +103,7 @@ For a concept, three stages (all from the [`sae-spelling`](https://github.com/la
 Extending to a new property needs its own ICL formatter + logit-diff `metric_fn` + probe +
 k-sparse results; the calculator and aggregation are reused. Key gotchas: recalibrate the
 IG-gap threshold per property; verify a clean "main" latent even exists via the k-sparse F1
-curve; layer ceiling ≤17 for Gemma-2-2b.
+curve.
 
 ## Setup
 
