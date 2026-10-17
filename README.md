@@ -3,7 +3,7 @@
 **How a concept is carried inside a network depends on what kind of concept it is.** With Gemma Scope
 sparse autoencoders on Gemma-2-2B and 2-9B, letter-like properties are absorbed into token-specific
 latents (first letter on both models, last letter on 2B), while the structural property
-`is-capitalized` is carried with no single latent causally responsible for it.
+`is-capitalized` is almost never carried by a single causally responsible latent.
 
 **Technical report** ([`paper/paper.pdf`](paper/paper.pdf)): the full 15-page write-up, a cross-metric,
 cross-model study of feature absorption beyond first-letter spelling.
@@ -13,8 +13,13 @@ non-spelling features?*
 
 ## Headline result
 
-On `is-capitalized`, the causal **ablation** metric finds zero absorbed tokens: **0 of 200 scored
-candidates** (727-candidate pool) on Gemma-2-2b and **0/273** on Gemma-2-9b. Cross-model and
+On `is-capitalized`, the causal **ablation** metric finds almost no absorbed tokens: **1 of 198**
+scored main-silent candidates on Gemma-2-2b (0.005, Wilson 95% CI [0.001, 0.028]; 727-candidate pool)
+and **1 of 35** on Gemma-2-9b (0.029, [0.005, 0.145]; the other 238 of 273 candidates have an active main
+latent), counting a token when one probe-aligned latent's attribution is at least 3× the runner-up's.
+Under the same criterion first-letter gives 0.41 (2b) and 0.43 (9b). Chanin's original absolute IG-gap
+threshold reports 0/200 and 0/35, but on the binary True/False logit the largest gap is 0.05 (2b) and
+0.15 (9b), below the lowest threshold tested (0.5), so that zero is forced by scale. Cross-model and
 matched-accuracy controls make task failure or a dead layer unlikely explanations. The
 SAEBench-standard **projection** metric still reports single-latent absorption marginally above its
 random-direction null (**0.12** vs 0.03 at n=130, with slightly overlapping Wilson intervals), so for a
@@ -22,6 +27,9 @@ distributed structural feature the two standard metrics disagree and the project
 over-report.
 
 ![cross-model comparison](paper/figures/crossmodel.png)
+
+*The figure plots the absolute-gap ablation rate per probe true positive; its `is-capitalized` zeros are
+the scale-forced zeros described above, not the 1/198 and 1/35 counts.*
 
 **Does SAE feature absorption generalize beyond first-letter spelling?**
 
@@ -75,8 +83,8 @@ L0, *higher*) magnitude:
 | 445 | 0.010 | 0.017 |
 
 Last-letter is still a *letter* property (close to first-letter), so the two results reconcile:
-**letter-family properties generalize** (last-letter absorbs like first-letter), while **structural
-properties show no behavioral absorption at all**, and that split is where the projection metric
+**letter-family properties generalize** (last-letter absorbs like first-letter), while
+**`is-capitalized` shows almost no behavioral absorption**, and that split is where the projection metric
 parts ways with the causal one (see the [headline result](#headline-result) above). The full `is-capitalized`
 study is in the [final report](paper/paper.pdf).
 
@@ -112,7 +120,8 @@ cd sae-spelling && uv venv --python 3.11 .venv && uv pip install --python .venv 
 cd sae-spelling && .venv/bin/python ../run_gate.py --layer 12 --width 16000 --max-prompts 200
 ```
 
-Produces `results/gate/gate_summary.json` with the per-letter and mean absorption rate.
+Produces `results/gate/gate_summary_l0<L0>.json` (`gate_summary_l082.json` for this command) with the
+per-letter and mean absorption rate.
 
 ## Prior art
 
