@@ -1,0 +1,184 @@
+{
+  "generated_by": "count_absorption.py",
+  "criterion": "absorbed iff main latent(s) silent (<1e-8), top IG attribution < 0, top latent probe cosine >= 0.025, and |top| >= R*|second| (scale-free ratio, as in analyze_scalefree.py); 'conditioned' rates are over main-silent scored tokens, with Wilson 95% intervals",
+  "R_values": [
+    1.5,
+    2.0,
+    3.0
+  ],
+  "absolute_gap_criterion": "Chanin: same conditions but |top| - |second| >= threshold instead of the ratio",
+  "pools": {
+    "is_capitalized_2b": {
+      "source_parquet": "results/is_capitalized/absorption_detail_l082.parquet",
+      "sha256": "9f94b22f917c6c1bd60fc3e9f2ffa416cdb25b65171166425c5818b662c48d3c",
+      "summary_json": "results/is_capitalized/summary_l082.json",
+      "num_candidates": 727,
+      "rows_scored": 200,
+      "main_silent_scored": 198,
+      "max_abs_ig_gap": 0.0499,
+      "absolute_gap_absorbed": {
+        "0.5": 0,
+        "1.0": 0,
+        "2.0": 0,
+        "4.0": 0
+      },
+      "conditioned": {
+        "R=1.5": {
+          "absorbed": 11,
+          "n": 198,
+          "rate": 0.0556,
+          "wilson95": [
+            0.0313,
+            0.0967
+          ]
+        },
+        "R=2.0": {
+          "absorbed": 2,
+          "n": 198,
+          "rate": 0.0101,
+          "wilson95": [
+            0.0028,
+            0.0361
+          ]
+        },
+        "R=3.0": {
+          "absorbed": 1,
+          "n": 198,
+          "rate": 0.0051,
+          "wilson95": [
+            0.0009,
+            0.028
+          ]
+        }
+      },
+      "per_probe_tp_R3": 0.00011969532100108814,
+      "per_probe_tp_inputs": {
+        "sample_portion": 0.6493506493506493,
+        "probe_true_positives": 12866
+      }
+    },
+    "is_capitalized_9b": {
+      "source_parquet": "results/is_capitalized_9b/absorption_detail_l068.parquet",
+      "sha256": "1804cc6e47085324e8b75c7cab7861ff4d7698448843565cca120fe6fc8a4f71",
+      "summary_json": "results/is_capitalized_9b/summary_l068.json",
+      "num_candidates": 273,
+      "rows_scored": 35,
+      "main_silent_scored": 35,
+      "max_abs_ig_gap": 0.1455,
+      "absolute_gap_absorbed": {
+        "0.5": 0,
+        "1.0": 0,
+        "2.0": 0,
+        "4.0": 0
+      },
+      "conditioned": {
+        "R=1.5": {
+          "absorbed": 6,
+          "n": 35,
+          "rate": 0.1714,
+          "wilson95": [
+            0.081,
+            0.3268
+          ]
+        },
+        "R=2.0": {
+          "absorbed": 3,
+          "n": 35,
+          "rate": 0.0857,
+          "wilson95": [
+            0.0296,
+            0.2238
+          ]
+        },
+        "R=3.0": {
+          "absorbed": 1,
+          "n": 35,
+          "rate": 0.0286,
+          "wilson95": [
+            0.0051,
+            0.1453
+          ]
+        }
+      },
+      "per_probe_tp_R3": 7.743534148985597e-05,
+      "per_probe_tp_inputs": {
+        "sample_portion": 1.0,
+        "probe_true_positives": 12914
+      }
+    },
+    "first_letter_2b": {
+      "source_parquet": "results/gate/absorption_layer12_16k_l082.parquet",
+      "sha256": "2f6dc3630064a648a0360a5df1cfd509efc054453f33b96a9cc5f4f87be6dab6",
+      "rows_scored": 2293,
+      "main_silent_scored": 2283,
+      "conditioned": {
+        "R=1.5": {
+          "absorbed": 1453,
+          "n": 2283,
+          "rate": 0.6364,
+          "wilson95": [
+            0.6165,
+            0.6559
+          ]
+        },
+        "R=2.0": {
+          "absorbed": 1237,
+          "n": 2283,
+          "rate": 0.5418,
+          "wilson95": [
+            0.5213,
+            0.5622
+          ]
+        },
+        "R=3.0": {
+          "absorbed": 930,
+          "n": 2283,
+          "rate": 0.4074,
+          "wilson95": [
+            0.3874,
+            0.4277
+          ]
+        }
+      },
+      "per_probe_tp_R3_mean_over_letters": 0.0381,
+      "per_probe_tp_absolute_gap_1.0_mean_over_letters": 0.0319
+    },
+    "first_letter_9b": {
+      "source_parquet": "results/first_letter_9b/absorption_layer20_16k_l068.parquet",
+      "sha256": "e50f42191877dde57816126afc692b4214f9d6096d188c07a43486119e0861a3",
+      "rows_scored": 2911,
+      "main_silent_scored": 2901,
+      "conditioned": {
+        "R=1.5": {
+          "absorbed": 1925,
+          "n": 2901,
+          "rate": 0.6636,
+          "wilson95": [
+            0.6462,
+            0.6805
+          ]
+        },
+        "R=2.0": {
+          "absorbed": 1670,
+          "n": 2901,
+          "rate": 0.5757,
+          "wilson95": [
+            0.5576,
+            0.5935
+          ]
+        },
+        "R=3.0": {
+          "absorbed": 1238,
+          "n": 2901,
+          "rate": 0.4267,
+          "wilson95": [
+            0.4089,
+            0.4448
+          ]
+        }
+      },
+      "per_probe_tp_R3_mean_over_letters": 0.0491,
+      "per_probe_tp_absolute_gap_1.0_mean_over_letters": 0.045
+    }
+  }
+}
