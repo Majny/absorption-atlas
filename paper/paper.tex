@@ -53,14 +53,17 @@ Gemma-2-9b (Gemma Scope $16$k SAEs), we find that they \emph{disagree}. The proj
 single-dominant-latent absorption whose point estimate is $3.6\times$ its random-direction null
 ($0.12$ vs.\ $0.03$ at the strict dominance ratio $R{=}3$, $n{=}130$; Wilson $95\%$ CI $[0.077,0.191]$,
 which excludes the null point estimate but is marginal at this sample size), whereas the ablation
-metric reports zero absorption on every candidate token it scores ($0/200$ sampled from the
-$727$-candidate pool on Gemma-2-2b, $0/273$ on Gemma-2-9b). Two controls rule out the mundane
-explanations: the zero is not caused by the model failing the task (Gemma-2-9b performs \iscap{} at
-$0.91$ accuracy, versus $0.59$ for 2b, yet ablation absorption stays $0.0$) and not by a dead layer
-(at the same 9b layer the ablation metric fires at $0.045$ for spelling, and at \emph{matched} task
-accuracy ${\sim}0.9$ it fires at ${\sim}0.017$--$0.035$ for spelling while \iscap{} remains $0.0$). We
+metric finds almost no absorbed tokens: $1$ of $198$ scored main-silent candidates on Gemma-2-2b
+($727$-candidate pool) and $1$ of $35$ on Gemma-2-9b (the other $238$ of $273$ candidates have an active
+main latent), counting a token when one probe-aligned latent's attribution is at least $3\times$ the
+runner-up's; under the same criterion first-letter gives $0.41$ (2b) and $0.43$ (9b). Chanin's original
+absolute attribution-gap threshold reports $0/200$ and $0/35$, but on the binary True/False logit that zero
+is forced by scale. Two controls make the mundane explanations unlikely: the near-zero is not caused by the
+model failing the task (Gemma-2-9b performs \iscap{} at $0.91$ accuracy, versus $0.59$ for 2b, yet
+ablation absorption stays at $1/35$) and not by a dead layer (at the same 9b layer the ablation metric
+fires at $0.045$ for spelling). We
 conclude that the field-standard projection metric appears to over-report single-latent absorption for
-a distributed structural feature that has no single-latent causal correlate. As a secondary, controlled result, we show, through
+a distributed structural feature that has almost no single-latent causal correlate. As a secondary, controlled result, we show, through
 two independent task-accuracy manipulations, that ablation-based absorption is itself sensitive to
 task performance, whereas the projection metric is not. We reproduce first-letter absorption and its
 dependence on SAE sparsity as pipeline validation. Effects are near-floor and the study spans one
@@ -115,12 +118,13 @@ task, on a structurally different property?
 \end{quote}
 We study this for objective, non-spelling token properties (primarily \iscap{}, whether a single-token
 word begins with an uppercase letter) and find that the metrics \emph{disagree}. The representational
-metric reports (weak, above-null) single-latent absorption for \iscap{}; the causal metric reports a clean
-zero. We then spend most of the paper ruling out the boring reasons for that zero, because one of them,
+metric reports (weak, above-null) single-latent absorption for \iscap{}; the causal metric finds almost
+none ($1/198$ on 2b, $1/35$ on 9b). We then spend most of the paper testing the boring reasons for that
+near-zero, because one of them,
 ``the causal metric is known to die in later layers,'' is a documented artifact rather than evidence of
 no absorption. Using a cross-model control (Gemma-2-9b, which performs the task much better than 2b) and a
-layer- and accuracy-matched spelling control, we show the zero is genuine: it is neither a task-performance
-artifact nor a dead-layer artifact.
+layer-matched spelling control, we show that the near-zero is unlikely to be either a task-performance
+artifact or a dead-layer artifact.
 
 \paragraph{Contributions.}
 \begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
@@ -131,12 +135,13 @@ artifact nor a dead-layer artifact.
   to our knowledge, the first \emph{direct contrast of the two absorption metrics} on such features
   (\S\ref{sec:related}).
   \item \textbf{A metric disagreement, with confidence intervals.} For \iscap{}, projection reports
-  above-null absorption while ablation reports zero on every scored candidate ($0/200$ sampled from
-  $727$ candidates on Gemma-2-2b, $0/273$ on Gemma-2-9b); we report CIs and candidate counts throughout,
+  above-null absorption while ablation finds almost none ($1/198$ scored main-silent candidates on
+  Gemma-2-2b, $1/35$ on Gemma-2-9b, at dominance ratio $R{=}3$; Chanin's absolute gap reads $0$ on both,
+  forced by scale); we report CIs and candidate counts throughout,
   because the effect is near-floor (\S\ref{sec:proj},\,\ref{sec:abl}).
-  \item \textbf{Controls that isolate the cause.} A cross-model task-ability control and a layer- and
-  accuracy-matched spelling control together rule out both ``the model cannot do the task'' and ``the layer
-  is dead'' (\S\ref{sec:controls}).
+  \item \textbf{Controls that isolate the cause.} A cross-model task-ability control and a layer-matched
+  spelling control together make both ``the model cannot do the task'' and ``the layer
+  is dead'' unlikely (\S\ref{sec:controls}).
   \item \textbf{A reliability caveat for the ablation metric.} Two independent task-accuracy manipulations
   show ablation-based absorption tracks task performance while the projection metric does not
   (\S\ref{sec:mech}).
@@ -259,7 +264,7 @@ that would make them \emph{identifying}; an absorption metric is exactly such a 
 guarantee. This is the standard motivation for activation patching and causal-mediation analysis (e.g.\
 \citealp{meng2022rome}), and it is why the original absorption metric was causal in the first place. Our
 contribution is the concrete observation that, for a distributed structural feature, the representational
-absorption signal survives while the causal one vanishes even where the causal metric is valid.
+absorption signal survives while the causal one nearly vanishes even where the causal metric is valid.
 
 \section{Methods}\label{sec:methods}
 \paragraph{Models, SAEs, and layers.}
@@ -297,7 +302,11 @@ We follow \citet{chanin2024absorption}: on each candidate, integrated-gradient a
 the task logit-difference, counting a token as absorbed if the main latents are silent, the single
 most causal latent is clearly dominant (an additive attribution-gap threshold), and it is probe-aligned
 ($\cos\ge 0.025$). The rate is (absorbed / probe-true-positives). For the binary True/False tasks the metric
-is the True-minus-False answer-logit.
+is the True-minus-False answer-logit. The additive gap threshold is calibrated to the 26-way letter logit; on
+the binary logit the largest gap among scored \iscap{} tokens is $0.050$ (2b) and $0.146$ (9b), below every
+threshold tested ($0.5$--$4.0$), so the absolute-gap rate is $0$ by scale alone. For binary properties we
+therefore also count a token as absorbed under a scale-free ratio (main latents silent, top attribution
+negative and probe-aligned, $|\text{top}|\ge R\,|\text{second}|$), conditioned on main-silent scored tokens.
 
 \paragraph{Projection metric.}
 We compute the per-latent contributions of Eq.~\eqref{eq:proj} at the candidate word position, exclude the
@@ -307,12 +316,9 @@ random unit directions), at $R\in\{1.5,2,3\}$.
 
 \paragraph{Task accuracy and controls.}
 For each (property, model) we measure the model's in-context task accuracy. To decide whether an ablation
-zero means ``not causally absorbed'' versus one of two confounds, we use: (a) a \textbf{cross-model} control
-(Gemma-2-9b performs \iscap{} far better than 2b); (b) a \textbf{layer-matched} spelling control
-(first-letter ablation absorption at the same 9b layer/$L_0$); and (c) a \textbf{matched-accuracy} control:
-we sweep first-letter task accuracy by varying the number of in-context examples and, separately, by
-corrupting a deterministic fraction of in-context answers, so spelling and structural absorption can be
-compared at equal accuracy.
+near-zero means ``not causally absorbed'' versus one of two confounds, we use: (a) a \textbf{cross-model} control
+(Gemma-2-9b performs \iscap{} far better than 2b); and (b) a \textbf{layer-matched} spelling control
+(first-letter ablation absorption at the same 9b layer/$L_0$).
 
 \paragraph{Statistics and implementation.}
 All rates carry $95\%$ confidence intervals (Wilson score intervals for the conditioned projection rates
@@ -406,14 +412,34 @@ absorption.
   above the null but underpowered ($\ast$).}\label{fig:probedir}
 \end{figure}
 
-\subsection{The ablation metric reports a clean zero}\label{sec:abl}
-The ablation metric tells the opposite story. For \iscap{} it reports absorption of exactly $0.0$ on every
-scored candidate: $0/200$ sampled from the $727$-candidate pool on Gemma-2-2b (Table~\ref{tab:funnel})
-and $0/273$ on Gemma-2-9b (binomial $95\%$ CI $[0,0.011]$ for the 9b pool). The probe and main latent are excellent in both cases (probe AUROC $\approx 1.00$, $k$-sparse
+\subsection{The ablation metric finds almost no absorption}\label{sec:abl}
+The ablation metric tells the opposite story. For \iscap{}, Chanin's absolute-gap criterion reports exactly
+$0.0$: $0/200$ sampled from the $727$-candidate pool on Gemma-2-2b (Table~\ref{tab:funnel}) and $0/35$ on
+Gemma-2-9b (the other $238$ of $273$ candidates have an active main latent), but that zero is forced by scale
+(\S\ref{sec:methods}). Under the scale-free ratio at $R{=}3$, conditioned on main-silent scored tokens,
+ablation finds $1/198$ on 2b ($0.005$, Wilson $95\%$ CI $[0.001,0.028]$) and $1/35$ on 9b ($0.029$,
+$[0.005,0.145]$), against $0.41$ and $0.43$ for first-letter (Table~\ref{tab:ablsf}). The probe and main latent are excellent in both cases (probe AUROC $\approx 1.00$, $k$-sparse
 $F_1\approx 0.99$), so this is not a failure to find the concept: the concept is cleanly present and cleanly
-detectable; it simply is not carried causally by a single absorbing latent.
+detectable; it is almost never carried causally by a single absorbing latent.
 
-Table~\ref{tab:funnel} shows \emph{why} the ablation metric returns zero, by tracing where candidates drop
+\begin{table}[t]
+  \centering
+  \caption{Ablation absorption under the scale-free ratio $|\text{top}|\ge R\,|\text{second}|$, conditioned
+  on main-silent scored tokens, with Wilson $95\%$ CIs.}\label{tab:ablsf}
+  \small
+  \begin{tabular}{lccc}
+    \toprule
+    pool & $R{=}1.5$ & $R{=}2$ & $R{=}3$ \\
+    \midrule
+    first-letter, 2b ($n{=}2283$) & 0.64\ [0.62,\,0.66] & 0.54\ [0.52,\,0.56] & 0.41\ [0.39,\,0.43] \\
+    \iscap{}, 2b ($n{=}198$) & 0.056\ [0.031,\,0.097] & 0.010\ [0.003,\,0.036] & 0.005\ [0.001,\,0.028] \\
+    first-letter, 9b ($n{=}2901$) & 0.66\ [0.65,\,0.68] & 0.58\ [0.56,\,0.59] & 0.43\ [0.41,\,0.45] \\
+    \iscap{}, 9b ($n{=}35$) & 0.17\ [0.08,\,0.33] & 0.086\ [0.03,\,0.22] & 0.029\ [0.005,\,0.145] \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:funnel} shows \emph{why} the ablation metric finds almost no absorption, by tracing where candidates drop
 out of the absorption predicate on 2b. Essentially all sampled candidates have the main latent silent
 \emph{and} a most-negative-attribution latent (so there is causal structure to test), but almost none have
 that latent aligned with the concept direction, and, even among those, the attribution is spread across
@@ -427,7 +453,8 @@ latent'' criterion counts as (weak) absorption but the causal criterion does not
   \caption{Ablation-metric drop-out funnel on Gemma-2-2b (layer 12). For each binary property we show the
   probe/latent quality, the candidate pool, and how many sampled main-silent candidates pass each successive
   criterion (most-negative-attribution latent; probe-aligned). Almost all candidates have a causal
-  latent, but few are concept-aligned, and the final single-dominant absorption rate is $0.0$ throughout.}
+  latent, but few are concept-aligned, and the final absolute-gap absorption rate is $0.0$ throughout
+  (forced by scale on the binary logit; Table~\ref{tab:ablsf} gives the scale-free \iscap{} counts).}
   \label{tab:funnel}
   \small
   \begin{tabular}{lcccccc}
@@ -443,36 +470,34 @@ latent'' criterion counts as (weak) absorption but the causal criterion does not
 \end{table}
 
 \subsection{Controls: not task-validity, not a dead layer}\label{sec:controls}
-The decisive worry is that the ablation zero is the known later-layer artifact rather than a genuine absence
-of causal absorption. Two controls rule this out (Table~\ref{tab:cross}, Figure~\ref{fig:cross}).
+The decisive worry is that the ablation near-zero is the known later-layer artifact rather than a genuine absence
+of causal absorption. Two controls make this unlikely (Table~\ref{tab:cross}, Figure~\ref{fig:cross}).
 
 \emph{Task ability.} Gemma-2-9b performs \iscap{} at $0.91$ in-context accuracy, versus $0.59$ for
-Gemma-2-2b (both from the balanced-ICL row of Appendix~\ref{app:extended}, Table~\ref{tab:acc}). If the zero were because the model could not
-do the task and so provided no behavioral signal to attribute, it should lift on 9b. It does not: 9b \iscap{}
-ablation absorption is again $0.0$, on all $273$ candidates.
+Gemma-2-2b (both from the balanced-ICL row of Appendix~\ref{app:extended}, Table~\ref{tab:acc}). If the near-zero were because the model could not
+do the task and so provided no behavioral signal to attribute, it should lift on 9b. It does not: on 9b,
+$238$ of the $273$ candidates have an active main latent, and of the $35$ scored, $1$ is absorbed at $R{=}3$
+($0.029$, $[0.005,0.145]$; $0/35$ under the absolute gap).
 
 \emph{Layer validity.} At the \emph{same} 9b layer and $L_0$, first-letter ablation absorption is $0.045$
-(higher than 2b's $0.032$), so the ablation metric demonstrably fires at that operating point. The zero is
-therefore specific to the structural property, not the layer.
-
-\emph{Matched accuracy.} Finally, using the accuracy sweep of \S\ref{sec:mech}, at matched task accuracy
-${\sim}0.9$ (bracketing the 9b \iscap{} accuracy of $0.91$) first-letter ablation absorption is
-${\sim}0.017$--$0.035$ depending on the manipulation (Tables~\ref{tab:iclsweep}--\ref{tab:corrupt}: ICL
-gives $0.035$ at accuracy $0.92$, corrupted-ICL gives $0.017$ at accuracy $0.93$), while \iscap{} is $0.0$.
-So even holding task ability fixed, spelling absorbs and \iscap{} does not.
+(higher than 2b's $0.032$; $0.43$ conditioned at $R{=}3$), so the ablation metric demonstrably fires at that
+operating point. The near-zero is therefore specific to the structural property, not the layer.
 
 \begin{table}[t]
   \centering
-  \caption{Cross-model ablation (behavioral) absorption. Spelling absorbs on both models; \iscap{} on
-  neither, even as its task accuracy rises from $0.59$ (2b) to $0.91$ (9b).}\label{tab:cross}
-  \begin{tabular}{llcc}
+  \caption{Cross-model ablation (behavioral) absorption, per probe true positive under Chanin's absolute
+  gap and conditioned on main-silent scored tokens under the scale-free ratio $R{=}3$. The \iscap{}
+  absolute-gap zeros are forced by scale. Spelling absorbs on both models; \iscap{} almost never, even as
+  its task accuracy rises from $0.59$ (2b) to $0.91$ (9b).}\label{tab:cross}
+  \small
+  \begin{tabular}{llccc}
     \toprule
-    property & model / layer & task accuracy & ablation absorption \\
+    property & model / layer & task accuracy & absolute gap & $R{=}3$, conditioned \\
     \midrule
-    first-letter & Gemma-2-2b / L12 & ${\sim}0.95$ & 0.032 \\
-    first-letter & Gemma-2-9b / L20 & ${\sim}0.96$ & 0.045 \\
-    \iscap{}     & Gemma-2-2b / L12 & 0.59 & 0.000 \\
-    \iscap{}     & Gemma-2-9b / L20 & 0.91 & 0.000 \\
+    first-letter & Gemma-2-2b / L12 & ${\sim}0.95$ & 0.032 & 0.41 \\
+    first-letter & Gemma-2-9b / L20 & ${\sim}0.96$ & 0.045 & 0.43 \\
+    \iscap{}     & Gemma-2-2b / L12 & 0.59 & 0.000 & 0.005 (1/198) \\
+    \iscap{}     & Gemma-2-9b / L20 & 0.91 & 0.000 & 0.029 (1/35) \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -480,9 +505,10 @@ So even holding task ability fixed, spelling absorbs and \iscap{} does not.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.6\textwidth]{figures/crossmodel.png}
-  \caption{The structural (blue) behavioral-absorption zero persists even as the model's task accuracy rises
-  from $0.59$ to $0.91$, while spelling (red) absorbs on both models, so the zero is not a task-performance
-  artifact.}\label{fig:cross}
+  \caption{Absolute-gap ablation absorption per probe true positive against task accuracy. The structural
+  (blue) zeros are forced by scale on the binary logit (\S\ref{sec:abl}); under the scale-free ratio at
+  $R{=}3$, \iscap{} is $1/198$ (2b) and $1/35$ (9b) against $0.41$ and $0.43$ for spelling (red;
+  Table~\ref{tab:cross}).}\label{fig:cross}
 \end{figure}
 
 \subsection{The ablation metric is itself task-accuracy-sensitive}\label{sec:mech}
@@ -543,17 +569,17 @@ absorption across settings of differing difficulty.
 \section{Discussion}\label{sec:discuss}
 \paragraph{The defensible reading is a metric-validity one.}
 For \iscap{}, the SAEBench-standard projection metric's ``single dominant latent'' criterion reads modestly
-above chance, yet there is no causal single-latent correlate: the ablation metric, in a regime where it
-demonstrably works for spelling and where the model performs the task, reports a clean zero. The narrow,
+above chance, yet there is almost no causal single-latent correlate: the ablation metric, in a regime where it
+demonstrably works for spelling and where the model performs the task, finds $1/198$ and $1/35$. The narrow,
 checkable claim is therefore that the projection metric appears to \emph{over-report} single-latent
 absorption for a distributed structural feature whose concept direction is present in the residual but not
 concentrated in one causally load-bearing latent. We deliberately avoid the grander phrase ``a
 representational-causal dissociation'': the effect is near-floor and rests on one well-powered property.
-We are also precise about what the ablation zero does and does not show. The ablation metric is, by
+We are also precise about what the ablation near-zero does and does not show. The ablation metric is, by
 construction, a \emph{single-latent} detector: it counts a token only when one latent both dominates the
-attribution and aligns with the probe. Its zero is therefore not evidence that capitalization has no causal
-mechanism (the model demonstrably computes the answer); it is evidence that no \emph{single} latent
-absorbs the concept, which is exactly the object the projection metric claims to have found.
+attribution and aligns with the probe. Its near-zero is therefore not evidence that capitalization has no causal
+mechanism (the model demonstrably computes the answer); it is evidence that almost never does a \emph{single} latent
+absorb the concept, which is exactly the object the projection metric claims to have found.
 
 \paragraph{The most likely mechanism, stated plainly: feature hedging.}
 Capitalization is a high-frequency, broadly co-occurring concept. Under feature hedging
@@ -581,7 +607,10 @@ the field \citep{kantamneni2025saeprobing}: representational SAE metrics benefit
 \section{Limitations and Threats to Validity}\label{sec:limits}
 We state the weaknesses plainly.
 \begin{itemize}[leftmargin=1.4em,itemsep=2pt]
-  \item \textbf{Near-floor effects.} Spelling ablation absorption is only ${\sim}0.01$--$0.05$ anywhere, and
+  \item \textbf{Ablation threshold scale.} Chanin's absolute attribution-gap threshold cannot fire on the
+  binary logit, so the \iscap{} ablation numbers rest on the scale-free ratio $R$, a substitute introduced for
+  this reason (\code{analyze\_scalefree.py}). The 9b ablation pool is small ($n{=}35$, $R{=}3$ CI up to $0.145$).
+  \item \textbf{Near-floor effects.} Spelling ablation absorption is only ${\sim}0.01$--$0.05$ of probe true positives anywhere, and
   the \iscap{} projection signal is marginal above its null at $n{=}130$. The whole disagreement hinges on
   distinguishing a few percent from zero; we report CIs, but the numbers are small.
   \item \textbf{One well-powered property.} Only \iscap{} is robust; \allcaps{} and the suffix properties
@@ -601,8 +630,8 @@ We state the weaknesses plainly.
 \section{Conclusion and Future Work}\label{sec:concl}
 Measuring SAE feature absorption off the first-letter spelling task exposes a disagreement between its two
 standard metrics. For \iscap{}, the projection (representational) metric reports weak-but-above-null
-single-latent absorption that the ablation (causal) metric denies, and controls show the denial is neither a
-task-performance nor a dead-layer artifact. The most likely mechanism is feature hedging, and the honest
+single-latent absorption that the ablation (causal) metric almost entirely denies ($1/198$ on 2b, $1/35$ on
+9b), and controls make a task-performance or dead-layer artifact unlikely. The most likely mechanism is feature hedging, and the honest
 headline is a metric-validity caveat: representational absorption signals for distributed structural
 features can lack a single-latent causal correlate.
 
@@ -618,7 +647,9 @@ honestly scoped caveat rather than a discovery.
 \paragraph{Reproducibility.}
 All code, figures, and per-run numbers behind every claim are in the accompanying \code{absorption-atlas}
 repository, including the model-agnostic loaders used for the cross-model controls and the independently
-review-verified single-class absorption pipeline. Appendix~\ref{app:repro} lists the exact configuration.
+review-verified single-class absorption pipeline. The first-letter and Gemma-2-9b \iscap{} ablation detail
+files are not committed; their counts, with checksums, are in \code{results/absorption\_counts.json}.
+Appendix~\ref{app:repro} lists the exact configuration.
 
 \appendix
 \section{Reproducibility details}\label{app:repro}
@@ -664,7 +695,7 @@ performs the task well under every format while 2b is stuck near chance.
 \begin{table}[h]
   \centering
   \caption{Balanced in-context accuracy on \iscap{} under four prompt formats. Gemma-2-9b performs the task
-  well under every format; Gemma-2-2b is near chance, which is why the 2b ablation zero could a priori be a
+  well under every format; Gemma-2-2b is near chance, which is why the 2b ablation near-zero could a priori be a
   task-validity artifact, and why the 9b control is needed.}\label{tab:acc}
   \small
   \begin{tabular}{lcc}
@@ -693,9 +724,9 @@ built purpose-made experiments to test and then rejected. Each was discarded on 
   \item \textbf{``The structural zero is a task-validity artifact.''} The natural next hypothesis was that
   ablation reads zero for structural properties only because the model cannot do the task, so a more capable
   model would show absorption. \emph{Rejected:} Gemma-2-9b performs \iscap{} at $0.91$ accuracy yet still
-  shows $0.0$ ablation absorption (\S\ref{sec:controls}); and at matched accuracy spelling still absorbs while
-  \iscap{} does not. Task validity is real \emph{within} spelling (\S\ref{sec:mech}) but does not explain the
-  structural zero. This falsification is what left the narrower, defensible metric-validity claim.
+  shows almost no ablation absorption ($1/35$ at $R{=}3$; the absolute-gap $0.0$ is forced by scale)
+  (\S\ref{sec:controls}). Task validity is real \emph{within} spelling (\S\ref{sec:mech}) but does not explain the
+  structural near-zero. This falsification is what left the narrower, defensible metric-validity claim.
   \item \textbf{A denominator/tautology confound.} Because structural main latents are very clean, they miss
   fewer tokens, giving smaller candidate pools and mechanically lower rates. \emph{Addressed:} we report the
   rate \emph{conditioned} on the main-silent pool (fraction of missed tokens that absorb), which removes the
