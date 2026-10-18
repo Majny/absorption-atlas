@@ -146,7 +146,7 @@ artifact or a dead-layer artifact.
   show ablation-based absorption tracks task performance while the projection metric does not
   (\S\ref{sec:mech}).
   \item \textbf{Reproducibility and honesty.} We release all code, a model-agnostic re-implementation used
-  for the cross-model controls, an independently review-verified single-class metric port, and
+  for the cross-model controls, a single-class metric port that the author checked line by line, and
   Appendix~\ref{app:rejected}, which documents three hypotheses we built controls to test and rejected.
 \end{enumerate}
 
@@ -293,9 +293,9 @@ false negatives on Gemma-2-2b, of which a sample of $200$ enters the ablation fu
 projection rate (Table~\ref{tab:proj}); on Gemma-2-9b there are $273$ candidates. The projection and
 ablation rates for a given model are therefore computed on the \emph{same} candidate set, with the
 projection metric further conditioned on the main-silent subset. For binary properties we use a
-single-class re-implementation of the 26-way pipeline; it was independently reviewed for faithfulness to the
-reference implementation (a line-by-line check of candidate selection, the denominator, and the
-absorption predicate).
+single-class re-implementation of the 26-way pipeline; the author checked it line by line against the
+reference implementation (candidate selection, the denominator, and the absorption predicate). This
+check was not independent.
 
 \paragraph{Ablation metric.}
 We follow \citet{chanin2024absorption}: on each candidate, integrated-gradient attribution of SAE latents to
@@ -646,8 +646,8 @@ honestly scoped caveat rather than a discovery.
 
 \paragraph{Reproducibility.}
 All code, figures, and per-run numbers behind every claim are in the accompanying \code{absorption-atlas}
-repository, including the model-agnostic loaders used for the cross-model controls and the independently
-review-verified single-class absorption pipeline. The first-letter and Gemma-2-9b \iscap{} ablation detail
+repository, including the model-agnostic loaders used for the cross-model controls and the single-class absorption
+pipeline, which the author checked line by line against the reference implementation. The first-letter and Gemma-2-9b \iscap{} ablation detail
 files are not committed; their counts, with checksums, are in \code{results/absorption\_counts.json}.
 Appendix~\ref{app:repro} lists the exact configuration.
 
