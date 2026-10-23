@@ -31,7 +31,7 @@ over-report.
 *Projection (SAEBench-standard) metric only: single-dominant-latent rate at R=3 on main-silent tokens,
 Gemma-2-2b layer 12, 16k, for the probe's concept direction versus a random direction (sparsity
 baseline). First-letter 0.53 (n=2085), last-letter 0.45 (n=2308), is-capitalized 0.12 (n=130); the
-suffix and all-caps pools (n=9–16) are underpowered. The ablation counts above are not in this figure.*
+suffix and all-caps pools (n=9 to 16) are underpowered. The ablation counts above are not in this figure.*
 
 **Does SAE feature absorption generalize beyond first-letter spelling?**
 
@@ -53,7 +53,7 @@ public SAEs (Gemma Scope), to answer that question.
 Reproduced first-letter feature absorption on current Gemma Scope SAEs (Gemma-2-2b, layer 12,
 width 16k), 200 prompts/letter, on GPU (2026-07-18). Rather than a single number, an **L0 sweep**
 reproduces the paper's central law (absorption rises steeply as L0 falls) and sits a consistent
-~2.6–3.4× *below* SAEBench's own JumpReLU reference; we suspect this reflects Google's
+~2.6 to 3.4× *below* SAEBench's own JumpReLU reference; we suspect this reflects Google's
 better-trained Gemma Scope SAEs:
 
 ![absorption vs L0](results/gate/absorption_vs_l0.png)
